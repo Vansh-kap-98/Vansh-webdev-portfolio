@@ -79,7 +79,7 @@ const defaultContent = {
   contactPageHeading: "Let's Work Together",
   contactPageSubtext: "Have a project in mind? I'd love to hear about it. Send me a message and let's create something amazing.",
   contactEmail: 'hello@vdesigns.com',
-  contactLocation: 'Based in San Francisco, CA\nAvailable globally',
+  contactLocation: 'Based in Jaipur, Rajasthan, India\nAvailable globally',
   contactResponseTime: 'Usually within 24 hours',
 };
 
