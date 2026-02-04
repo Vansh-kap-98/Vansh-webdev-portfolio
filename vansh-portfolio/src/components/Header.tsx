@@ -136,7 +136,7 @@ const Header = () => {
           onMouseLeave={(e) => handleMouseLeave(e)}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-accent-neon animate-pulse" />
-          Available
+          Work in Progress
         </a>
 
         {/* Mobile Menu Button */}
