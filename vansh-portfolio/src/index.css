@@ -1,0 +1,293 @@
+/* V-designs - Dark Luxury Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Core Dark Luxury Palette */
+    --background: 0 0% 2%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Dynamic Accent - Default Neutral */
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 2%;
+
+    /* Project Accent Colors */
+    --accent-teal: 175 70% 50%;
+    --accent-orange: 25 95% 55%;
+    --accent-neon: 120 100% 50%;
+    --accent-purple: 270 70% 60%;
+    --accent-gold: 45 90% 55%;
+    --accent-cyan: 190 100% 50%;
+
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 55%;
+
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 0 0% 100%;
+
+    --radius: 0.25rem;
+
+    /* Typography */
+    --font-heading: 'Manrope', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Spacing */
+    --section-padding: clamp(80px, 10vw, 160px);
+    --grid-gap: clamp(16px, 2vw, 32px);
+
+    /* Transitions */
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --duration-fast: 0.2s;
+    --duration-normal: 0.4s;
+    --duration-slow: 0.8s;
+
+    /* Sidebar - kept for shadcn compatibility */
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 2%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: auto;
+    cursor: none;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  /* Monospace accent text */
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Selection color */
+  ::selection {
+    background: hsl(var(--accent-teal) / 0.3);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer components {
+  /* Hero Typography */
+  .hero-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(3rem, 12vw, 10rem);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+  }
+
+  .hero-subtext {
+    font-family: var(--font-mono);
+    font-size: clamp(0.65rem, 1vw, 0.875rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Section Headings */
+  .section-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 6vw, 5rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  /* Project Card Styles */
+  .project-card {
+    @apply relative overflow-hidden;
+    transition: transform var(--duration-normal) var(--ease-smooth);
+  }
+
+  .project-card:hover {
+    transform: scale(0.98);
+  }
+
+  .project-card-dimmed {
+    opacity: 0.3;
+    filter: grayscale(0.5);
+    transition: all var(--duration-normal) var(--ease-smooth);
+  }
+
+  /* Magnetic Button Base */
+  .magnetic-target {
+    @apply relative inline-flex items-center justify-center;
+    transition: transform var(--duration-fast) var(--ease-smooth);
+  }
+
+  /* Grid Item Animation States */
+  .grid-item-reveal {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+
+  /* Scroll Indicator */
+  .scroll-indicator {
+    @apply fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2;
+  }
+
+  .scroll-indicator-line {
+    @apply w-px h-12 bg-gradient-to-b from-transparent via-white/50 to-transparent;
+    animation: scroll-pulse 2s ease-in-out infinite;
+  }
+
+  /* Label Chip */
+  .label-chip {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full;
+    background: hsl(var(--muted) / 0.5);
+    border: 1px solid hsl(var(--border));
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Accent Color Classes - for dynamic theming */
+  .accent-teal { --current-accent: var(--accent-teal); }
+  .accent-orange { --current-accent: var(--accent-orange); }
+  .accent-neon { --current-accent: var(--accent-neon); }
+  .accent-purple { --current-accent: var(--accent-purple); }
+  .accent-gold { --current-accent: var(--accent-gold); }
+  .accent-cyan { --current-accent: var(--accent-cyan); }
+
+  .accent-glow {
+    box-shadow: 0 0 60px hsl(var(--current-accent) / 0.3),
+                0 0 120px hsl(var(--current-accent) / 0.1);
+  }
+}
+
+@layer utilities {
+  /* Hide cursor on elements */
+  .cursor-none {
+    cursor: none;
+  }
+
+  /* Hide cursor on buttons and interactive elements */
+  button, a, input, textarea, select, [role="button"] {
+    cursor: none !important;
+  }
+
+  /* Text gradient utility */
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--muted-foreground)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Clip path utilities */
+  .clip-reveal {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .clip-hidden {
+    clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+  }
+
+  /* Blur backdrop */
+  .glass {
+    background: hsl(var(--background) / 0.8);
+    backdrop-filter: blur(20px);
+  }
+}
+
+@keyframes scroll-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.2);
+  }
+}
+
+/* Custom Cursor Hide on touch devices */
+@media (hover: none) {
+  html {
+    cursor: auto;
+  }
+  
+  .custom-cursor {
+    display: none !important;
+  }
+}
+
+/* CMS Portal - Always show default cursor */
+.cms-portal {
+  cursor: auto !important;
+}
+
+.cms-portal *,
+.cms-portal button,
+.cms-portal a,
+.cms-portal input,
+.cms-portal textarea,
+.cms-portal select,
+.cms-portal [role="button"] {
+  cursor: auto !important;
+}
+
+.cms-portal .custom-cursor {
+  display: none !important;
+}
