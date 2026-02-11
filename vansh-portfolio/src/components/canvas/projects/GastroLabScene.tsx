@@ -1,43 +1,34 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 // This component demonstrates exploded view product showcase
 // Dish layers separate on Y-axis as user scrolls
 const GastroLabScene = () => {
   const groupRef = useRef<THREE.Group>(null);
   const layersRef = useRef<THREE.Mesh[]>([]);
+  const [scrollProgress, setScrollProgress] = useState(0);
   
   // Layer offsets controlled by scroll
   const layerOffsets = useRef([0, 0, 0, 0, 0]);
 
   useEffect(() => {
-    // Create GSAP timeline linked to scroll position
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: '.gastro-section', // You'd add this class to the section
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1,
-      },
-    });
-
-    // Animate layer separation
-    layerOffsets.current.forEach((_, index) => {
-      tl.to(layerOffsets.current, {
-        [index]: (index - 2) * 1.5, // Spread layers apart
-        duration: 1,
-        ease: 'power2.inOut',
-      }, index * 0.1);
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrolled = window.scrollY;
+      const progress = scrollHeight > 0 ? scrolled / scrollHeight : 0;
+      setScrollProgress(progress);
+      
+      // Update layer offsets based on scroll
+      layerOffsets.current.forEach((_, index) => {
+        layerOffsets.current[index] = progress * (index - 2) * 1.5;
+      });
     };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useFrame(() => {

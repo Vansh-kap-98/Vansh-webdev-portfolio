@@ -5,6 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import VelocityEVScene from '@/components/canvas/projects/VelocityEVScene';
 import CustomCursor from '@/components/CustomCursor';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const colorOptions = [
   { name: 'Midnight Black', hex: '#1a1a1a' },
@@ -16,17 +17,39 @@ const colorOptions = [
 const VelocityEV = () => {
   const { setActiveAccent, setCursorStyle } = useThemeStore();
   const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
+  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
-    // Scroll to top on page load
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+    
     setActiveAccent('gold');
     setCursorStyle('velocity');
+    
     return () => {
       setActiveAccent(null);
       setCursorStyle('default');
     };
   }, [setActiveAccent, setCursorStyle]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      const opacity = Math.max(0, 1 - scrolled / 200);
+      setScrollIndicatorOpacity(opacity);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background cursor-none">

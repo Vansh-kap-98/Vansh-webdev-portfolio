@@ -1,18 +1,28 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 // This component demonstrates particle morphing
 // Particles morph into different symbols as user scrolls
 const NeuroCoreScene = () => {
   const instancedMeshRef = useRef<THREE.InstancedMesh>(null);
-  const morphProgress = useRef(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   
   const count = 500;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrolled = window.scrollY;
+      const progress = scrollHeight > 0 ? scrolled / scrollHeight : 0;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Define target positions for different shapes
   const shapeTargets = useMemo(() => {
@@ -66,36 +76,20 @@ const NeuroCoreScene = () => {
     ))
   );
 
-  const targetShape = useRef<'sphere' | 'shield' | 'bolt' | 'globe'>('sphere');
-
-  useEffect(() => {
-    // ScrollTrigger to change target shape
-    ScrollTrigger.create({
-      trigger: '.neurocore-section',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 1,
-      onUpdate: (self) => {
-        const progress = self.progress;
-        if (progress < 0.25) targetShape.current = 'sphere';
-        else if (progress < 0.5) targetShape.current = 'shield';
-        else if (progress < 0.75) targetShape.current = 'bolt';
-        else targetShape.current = 'globe';
-        
-        morphProgress.current = progress;
-      },
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
-    };
-  }, []);
+  // Determine target shape based on scroll progress
+  const getTargetShape = (progress: number): 'sphere' | 'shield' | 'bolt' | 'globe' => {
+    if (progress < 0.25) return 'sphere';
+    if (progress < 0.5) return 'shield';
+    if (progress < 0.75) return 'bolt';
+    return 'globe';
+  };
 
   useFrame(({ clock }) => {
     if (!instancedMeshRef.current) return;
 
     const dummy = new THREE.Object3D();
-    const targets = shapeTargets[targetShape.current];
+    const targetShape = getTargetShape(scrollProgress);
+    const targets = shapeTargets[targetShape];
     const time = clock.getElapsedTime();
 
     for (let i = 0; i < count; i++) {

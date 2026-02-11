@@ -17,6 +17,9 @@ const Index = () => {
   const { activeAccent } = useThemeStore();
 
   useEffect(() => {
+    // Scroll to top on mount
+    window.scrollTo(0, 0);
+    
     // Update CSS custom property for dynamic accent
     if (activeAccent && accentColors[activeAccent]) {
       document.documentElement.style.setProperty(
@@ -27,6 +30,15 @@ const Index = () => {
       document.documentElement.style.removeProperty('--current-accent');
     }
   }, [activeAccent]);
+
+  useEffect(() => {
+    // Refresh ScrollTrigger on mount to ensure animations work
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <SmoothScroll>

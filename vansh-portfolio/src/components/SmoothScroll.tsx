@@ -25,6 +25,9 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
 
     lenisRef.current = lenis;
 
+    // Scroll to top immediately
+    lenis.scrollTo(0, { immediate: true });
+
     lenis.on('scroll', ScrollTrigger.update);
 
     gsap.ticker.add((time) => {
@@ -32,6 +35,9 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     });
 
     gsap.ticker.lagSmoothing(0);
+
+    // Refresh ScrollTrigger after setup
+    ScrollTrigger.refresh();
 
     return () => {
       lenis.destroy();

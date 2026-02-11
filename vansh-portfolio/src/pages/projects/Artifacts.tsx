@@ -1,24 +1,47 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import ArtifactsScene from '@/components/canvas/projects/ArtifactsScene';
 import CustomCursor from '@/components/CustomCursor';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const Artifacts = () => {
   const { setActiveAccent, setCursorStyle } = useThemeStore();
+  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
-    // Scroll to top on page load
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+    
     setActiveAccent('cyan');
     setCursorStyle('artifacts');
+    
     return () => {
       setActiveAccent(null);
       setCursorStyle('default');
     };
   }, [setActiveAccent, setCursorStyle]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      const opacity = Math.max(0, 1 - scrolled / 200);
+      setScrollIndicatorOpacity(opacity);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background cursor-none">
@@ -48,7 +71,10 @@ const Artifacts = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2">
+      <div 
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
+        style={{ opacity: scrollIndicatorOpacity }}
+      >
         <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
           Scroll to Explore Gallery
         </span>
