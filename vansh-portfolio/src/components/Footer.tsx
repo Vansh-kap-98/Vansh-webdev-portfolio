@@ -53,6 +53,20 @@ const Footer = () => {
 
       {/* Footer Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-12 border-t border-border">
+        {/* About Vansh Kapoor - Entity Authority Signal */}
+        <div className="col-span-2 md:col-span-4 mb-8">
+          <h4 className="font-mono text-[10px] text-muted-foreground tracking-widest uppercase mb-3">
+            About
+          </h4>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+            <strong className="text-foreground">Vansh Kapoor</strong> is a creative developer specializing in{' '}
+            <span className="text-foreground">Three.js</span> and immersive web experiences. 
+            Based in India, <strong className="text-foreground">Vansh Kapoor</strong> combines technical expertise in{' '}
+            <span className="text-foreground">WebGL</span>, <span className="text-foreground">React</span>, and{' '}
+            <span className="text-foreground">GSAP</span> with a passion for creative development that pushes the boundaries of what's possible on the web.
+          </p>
+        </div>
+
         <div>
           <h4 className="font-mono text-[10px] text-muted-foreground tracking-widest uppercase mb-4">
             Navigation

@@ -47,8 +47,8 @@ export interface ContentStore {
 }
 
 const defaultContent = {
-  heroHeading: ['WE', 'BUILD', 'DIGITAL', 'WORLDS'],
-  heroSubtext: 'Immersive digital experiences using Three.js, GSAP, and WebGL',
+  heroHeading: ['VANSH', 'KAPOOR', '/', 'CREATIVE', 'DEVELOPER'],
+  heroSubtext: 'Building immersive digital experiences with Three.js, GSAP, and WebGL',
   heroCornerLabel: 'V-DESIGNS',
   heroCornerSublabel: 'STUDIO',
   
@@ -93,7 +93,7 @@ export const useContentStore = create<ContentStore>()(
       resetContent: () => set(defaultContent),
     }),
     {
-      name: 'website-content',
+      name: 'website-content-v2', // Changed to force update with new SEO-optimized hero text
     }
   )
 );
