@@ -21,7 +21,7 @@ const projects: Project[] = [
     type: 'Real Estate',
     tech: ['ScrollControls', 'CatmullRomCurve3'],
     accentColor: 'teal',
-    year: '2024',
+    year: '2026',
     description: 'Scroll-based camera flythrough from aerial to interior views',
   },
   {
@@ -31,7 +31,7 @@ const projects: Project[] = [
     type: 'Restaurant',
     tech: ['GSAP Timeline', 'Scroll Linked'],
     accentColor: 'orange',
-    year: '2024',
+    year: '2026',
     description: 'Exploded view product showcase revealing dish layers',
   },
   {
@@ -41,7 +41,7 @@ const projects: Project[] = [
     type: 'Fashion',
     tech: ['Cloth Simulation', 'Vertex Shader'],
     accentColor: 'neon',
-    year: '2024',
+    year: '2026',
     description: 'Physics-based cloth that deforms with mouse interaction',
   },
   {
@@ -51,7 +51,7 @@ const projects: Project[] = [
     type: 'SaaS',
     tech: ['InstancedMesh', 'Particle Morphing'],
     accentColor: 'purple',
-    year: '2024',
+    year: '2026',
     description: 'Particles morph into icons as users scroll through features',
   },
   {
@@ -61,7 +61,7 @@ const projects: Project[] = [
     type: 'Automotive',
     tech: ['Material Props', 'Camera Rig'],
     accentColor: 'gold',
-    year: '2024',
+    year: '2026',
     description: 'Real-time customization with interior camera transitions',
   },
   {
@@ -71,7 +71,7 @@ const projects: Project[] = [
     type: 'Museum',
     tech: ['FogExp2', 'Infinite Loop'],
     accentColor: 'cyan',
-    year: '2024',
+    year: '2026',
     description: 'Infinite tunnel gallery with floating artworks and fog',
   },
 ];
@@ -100,7 +100,7 @@ const WorkGrid = () => {
         </div>
         <div className="hidden md:block font-mono text-[10px] text-muted-foreground text-right">
           <div>PROJECTS: 06</div>
-          <div>YEAR: 2024</div>
+          <div>YEAR: 2026</div>
         </div>
       </div>
 

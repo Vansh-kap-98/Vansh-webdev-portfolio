@@ -6,6 +6,13 @@ export interface ExpertiseItem {
   color: string;
 }
 
+export interface OtherProject {
+  name: string;
+  description: string;
+  url: string;
+  category: string;
+}
+
 export interface ContentStore {
   // Hero Section
   heroHeading: string[];
@@ -18,6 +25,7 @@ export interface ContentStore {
   aboutText: string;
   aboutExpertise: ExpertiseItem[];
   aboutTechnologies: string[];
+  otherProjects: OtherProject[];
   
   // Header
   headerLogo: string;
@@ -53,7 +61,7 @@ const defaultContent = {
   heroCornerSublabel: 'STUDIO',
   
   aboutLabel: 'ABOUT / PHILOSOPHY',
-  aboutText: "We're a boutique digital studio obsessed with crafting immersive web experiences. Our expertise lies at the intersection of design, technology, and storytelling — where pixels meet purpose.",
+  aboutText: "I'm a creative developer obsessed with crafting immersive web experiences. My expertise lies at the intersection of design, technology, and storytelling — where pixels meet purpose.",
   aboutExpertise: [
     { text: 'WebGL & Three.js Development', color: '#2DD4BF' },
     { text: '3D Design & Animation', color: '#FB923C' },
@@ -61,13 +69,26 @@ const defaultContent = {
     { text: 'Motion Design & GSAP', color: '#C084FC' },
     { text: 'Modern Frontend Development', color: '#06B6D4' },
   ],
-  aboutTechnologies: ['React', 'Three.js', 'WebGL', 'GSAP', 'TypeScript', 'Tailwind', 'Vite', 'Blender', 'Figma'],
+  aboutTechnologies: [
+    'React', 'Three.js', 'WebGL', 'GSAP', 'TypeScript', 'JavaScript',
+    'Tailwind CSS', 'HTML5', 'CSS3', 'Vite', 'Node.js', 'Express',
+    'MongoDB', 'PostgreSQL', 'Git', 'GitHub', 'Blender', 'Figma',
+    'Adobe Creative Suite', 'REST APIs', 'Responsive Design', 'Performance Optimization'
+  ],
+  otherProjects: [
+    {
+      name: 'Add Your Project',
+      description: 'Description of your non-web design project',
+      url: 'https://github.com/yourusername/project',
+      category: 'Category'
+    }
+  ],
   
   headerLogo: 'V-designs',
   
   footerHeading: "LET'S CREATE SOMETHING EXTRAORDINARY",
   footerEmail: 'hello@v-designs.studio',
-  footerCopyright: '© 2025 V-DESIGNS. ALL RIGHTS RESERVED.',
+  footerCopyright: '© 2026 V-DESIGNS. ALL RIGHTS RESERVED.',
   footerTagline: 'DESIGNED & DEVELOPED WITH OBSESSIVE ATTENTION TO DETAIL',
   
   aboutPageHeading: 'Who I Am',

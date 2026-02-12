@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Scene from '@/components/canvas/Scene';
 import { useContentStore } from '@/stores/contentStore';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink } from 'lucide-react';
 
 const About = () => {
   const navigate = useNavigate();
@@ -16,7 +16,8 @@ const About = () => {
     aboutBackgroundText, 
     aboutApproachText,
     aboutExpertise,
-    aboutTechnologies
+    aboutTechnologies,
+    otherProjects
   } = useContentStore();
 
   useEffect(() => {
@@ -99,6 +100,53 @@ const About = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Resume Download */}
+              <div>
+                <h2 className="font-heading text-2xl font-bold mb-4">Resume</h2>
+                <a
+                  href="/Vansh_Kapoor_Resume.pdf"
+                  download="Vansh_Kapoor_Resume.pdf"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background hover:bg-foreground/90 transition-colors font-mono text-[11px] tracking-widest uppercase"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Resume
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Other Projects Section */}
+          <div className="mt-20 pt-20 border-t border-border max-w-6xl">
+            <div className="mb-8">
+              <h2 className="font-heading text-3xl font-bold mb-2">Other Projects</h2>
+              <p className="text-muted-foreground">
+                Beyond web design, here are some of my other technical projects and explorations.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {otherProjects.map((project, index) => (
+                <a
+                  key={index}
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group border border-border p-6 hover:border-foreground/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="font-mono text-[10px] text-muted-foreground tracking-widest uppercase">
+                      {project.category}
+                    </span>
+                    <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </div>
+                  <h3 className="font-heading text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                    {project.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {project.description}
+                  </p>
+                </a>
+              ))}
             </div>
           </div>
 
