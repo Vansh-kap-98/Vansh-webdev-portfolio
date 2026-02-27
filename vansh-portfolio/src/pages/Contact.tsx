@@ -21,9 +21,7 @@ const Contact = () => {
     message: '',
   });
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

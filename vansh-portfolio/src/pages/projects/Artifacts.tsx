@@ -68,7 +68,6 @@ const Artifacts = () => {
 
   useEffect(() => {
     ScrollTrigger.getAll().forEach(t => t.kill());
-    window.scrollTo(0, 0);
     setActiveAccent('cyan');
 
     // Add class to body to suppress global custom cursor on this page

@@ -17,9 +17,6 @@ const Index = () => {
   const { activeAccent } = useThemeStore();
 
   useEffect(() => {
-    // Scroll to top on mount
-    window.scrollTo(0, 0);
-
     // Update CSS custom property for dynamic accent
     if (activeAccent && accentColors[activeAccent]) {
       document.documentElement.style.setProperty(

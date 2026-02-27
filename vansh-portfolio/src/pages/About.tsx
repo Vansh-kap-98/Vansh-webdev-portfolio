@@ -20,9 +20,7 @@ const About = () => {
     otherProjects
   } = useContentStore();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+
 
   return (
     <SmoothScroll>

@@ -12,9 +12,7 @@ const Process = () => {
   const navigate = useNavigate();
   const { processPageHeading, processPageSubtext } = useContentStore();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+
 
   const steps = [
     {
