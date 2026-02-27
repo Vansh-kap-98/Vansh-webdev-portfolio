@@ -1,4 +1,4 @@
-import { useEffect, useRef, ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, ReactNode } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -12,7 +12,17 @@ interface SmoothScrollProps {
 const SmoothScroll = ({ children }: SmoothScrollProps) => {
   const lenisRef = useRef<Lenis | null>(null);
 
+  // Force scroll to top before Lenis takes over
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
   useEffect(() => {
+    // Ensure we're at top before creating Lenis
+    window.scrollTo(0, 0);
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -26,14 +36,15 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     lenisRef.current = lenis;
 
     // Scroll to top immediately
-    lenis.scrollTo(0, { immediate: true });
+    lenis.scrollTo(0);
 
     lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
+    const rafCallback = (time: number) => {
       lenis.raf(time * 1000);
-    });
+    };
 
+    gsap.ticker.add(rafCallback);
     gsap.ticker.lagSmoothing(0);
 
     // Refresh ScrollTrigger after setup
@@ -41,9 +52,8 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
 
     return () => {
       lenis.destroy();
-      gsap.ticker.remove((time) => {
-        lenis.raf(time * 1000);
-      });
+      gsap.ticker.remove(rafCallback);
+      lenisRef.current = null;
     };
   }, []);
 

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import Scene from '@/components/canvas/Scene';
 import SmoothScroll from '@/components/SmoothScroll';
-import CustomCursor from '@/components/CustomCursor';
+
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
@@ -19,7 +19,7 @@ const Index = () => {
   useEffect(() => {
     // Scroll to top on mount
     window.scrollTo(0, 0);
-    
+
     // Update CSS custom property for dynamic accent
     if (activeAccent && accentColors[activeAccent]) {
       document.documentElement.style.setProperty(
@@ -42,8 +42,7 @@ const Index = () => {
 
   return (
     <SmoothScroll>
-      {/* Custom Cursor */}
-      <CustomCursor />
+
 
       {/* 3D Background Canvas */}
       <Scene />

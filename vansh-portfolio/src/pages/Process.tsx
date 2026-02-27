@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SmoothScroll from '@/components/SmoothScroll';
-import CustomCursor from '@/components/CustomCursor';
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Scene from '@/components/canvas/Scene';
@@ -49,12 +49,12 @@ const Process = () => {
 
   return (
     <SmoothScroll>
-      <CustomCursor />
+
       <Scene />
-      
+
       <div className="relative z-10">
         <Header />
-        
+
         <main className="min-h-screen px-6 md:px-12 lg:px-20 py-32">
           {/* Back Button */}
           <button

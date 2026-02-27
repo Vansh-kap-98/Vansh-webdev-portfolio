@@ -60,7 +60,7 @@ const Footer = () => {
           </h4>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
             <strong className="text-foreground">Vansh Kapoor</strong> is a creative developer specializing in{' '}
-            <span className="text-foreground">Three.js</span> and immersive web experiences. 
+            <span className="text-foreground">Three.js</span> and immersive web experiences.
             Based in India, <strong className="text-foreground">Vansh Kapoor</strong> combines technical expertise in{' '}
             <span className="text-foreground">WebGL</span>, <span className="text-foreground">React</span>, and{' '}
             <span className="text-foreground">GSAP</span> with a passion for creative development that pushes the boundaries of what's possible on the web.
@@ -92,15 +92,20 @@ const Footer = () => {
             Social
           </h4>
           <ul className="space-y-2">
-            {['Twitter', 'LinkedIn', 'Dribbble', 'GitHub'].map((item) => (
-              <li key={item}>
+            {[
+              { name: 'LinkedIn', url: 'https://www.linkedin.com/in/vansh-kapoor-03a7572a7/' },
+              { name: 'GitHub', url: 'https://github.com/Vansh-kap-98' },
+            ].map((item) => (
+              <li key={item.name}>
                 <a
-                  href="#"
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onMouseEnter={() => setCursorVariant('hover')}
                   onMouseLeave={() => setCursorVariant('default')}
                 >
-                  {item}
+                  {item.name}
                 </a>
               </li>
             ))}

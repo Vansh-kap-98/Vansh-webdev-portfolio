@@ -34,6 +34,11 @@ const ProjectCard = ({
   const accentColor = project.accentColor ? accentColors[project.accentColor] : null;
 
   const handleClick = () => {
+    // Kill all ScrollTrigger instances and reset scroll before navigating
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     navigate(`/projects/${project.id}`);
   };
 
@@ -89,18 +94,16 @@ const ProjectCard = ({
   return (
     <div
       ref={cardRef}
-      className={`project-card group relative cursor-pointer ${isLarge ? 'md:col-span-2' : ''} ${
-        isDimmed ? 'project-card-dimmed' : ''
-      }`}
+      className={`project-card group relative cursor-pointer ${isLarge ? 'md:col-span-2' : ''} ${isDimmed ? 'project-card-dimmed' : ''
+        }`}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Image Container */}
       <div
-        className={`relative overflow-hidden bg-card rounded-sm ${
-          isLarge ? 'aspect-[21/9]' : 'aspect-[4/3]'
-        }`}
+        className={`relative overflow-hidden bg-card rounded-sm ${isLarge ? 'aspect-[21/9]' : 'aspect-[4/3]'
+          }`}
       >
         {/* Placeholder visual with accent glow */}
         <div
@@ -161,11 +164,10 @@ const ProjectCard = ({
         </div>
 
         <div
-          className={`flex items-center justify-center w-12 h-12 rounded-full border transition-all duration-300 ${
-            isHovered
+          className={`flex items-center justify-center w-12 h-12 rounded-full border transition-all duration-300 ${isHovered
               ? 'border-foreground bg-foreground text-background'
               : 'border-border text-muted-foreground'
-          }`}
+            }`}
         >
           <ArrowUpRight className="w-5 h-5" />
         </div>

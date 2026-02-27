@@ -4,11 +4,11 @@ import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import VoidStreetwearScene from '@/components/canvas/projects/VoidStreetwearScene';
-import CustomCursor from '@/components/CustomCursor';
+
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const VoidStreetwear = () => {
-  const { setActiveAccent, setCursorStyle } = useThemeStore();
+  const { setActiveAccent } = useThemeStore();
   const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
@@ -16,21 +16,19 @@ const VoidStreetwear = () => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    
+
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     });
-    
+
     setActiveAccent('neon');
-    setCursorStyle('void');
-    
+
     return () => {
       setActiveAccent(null);
-      setCursorStyle('default');
     };
-  }, [setActiveAccent, setCursorStyle]);
+  }, [setActiveAccent]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,8 +42,7 @@ const VoidStreetwear = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen bg-background">
       {/* Back Button */}
       <Link
         to="/"
@@ -73,7 +70,7 @@ const VoidStreetwear = () => {
       </div>
 
       {/* Interaction Hint */}
-      <div 
+      <div
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
         style={{ opacity: scrollIndicatorOpacity }}
       >
@@ -91,7 +88,7 @@ const VoidStreetwear = () => {
             Feel the<br />Movement
           </h2>
           <p className="text-muted-foreground">
-            Physics-based cloth that responds to your every move. 
+            Physics-based cloth that responds to your every move.
             Drag, pull, and watch fabric come alive.
           </p>
         </div>

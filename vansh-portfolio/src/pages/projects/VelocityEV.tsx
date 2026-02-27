@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import VelocityEVScene from '@/components/canvas/projects/VelocityEVScene';
-import CustomCursor from '@/components/CustomCursor';
+
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const colorOptions = [
@@ -15,7 +15,7 @@ const colorOptions = [
 ];
 
 const VelocityEV = () => {
-  const { setActiveAccent, setCursorStyle } = useThemeStore();
+  const { setActiveAccent } = useThemeStore();
   const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
   const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
@@ -24,21 +24,19 @@ const VelocityEV = () => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    
+
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     });
-    
+
     setActiveAccent('gold');
-    setCursorStyle('velocity');
-    
+
     return () => {
       setActiveAccent(null);
-      setCursorStyle('default');
     };
-  }, [setActiveAccent, setCursorStyle]);
+  }, [setActiveAccent]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,8 +50,7 @@ const VelocityEV = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen bg-background">
       {/* Back Button */}
       <Link
         to="/"
@@ -90,11 +87,10 @@ const VelocityEV = () => {
           <button
             key={color.name}
             onClick={() => setSelectedColor(color)}
-            className={`w-10 h-10 rounded-full border-2 transition-all ${
-              selectedColor.name === color.name
-                ? 'border-foreground scale-110'
-                : 'border-transparent hover:border-muted-foreground'
-            }`}
+            className={`w-10 h-10 rounded-full border-2 transition-all ${selectedColor.name === color.name
+              ? 'border-foreground scale-110'
+              : 'border-transparent hover:border-muted-foreground'
+              }`}
             style={{ backgroundColor: color.hex }}
             title={color.name}
           />
@@ -112,8 +108,8 @@ const VelocityEV = () => {
       </div>
 
       {/* Content Overlay */}
-      <div className="relative z-10 pointer-events-none h-screen flex items-end pb-20">
-        <div className="px-12 flex items-end justify-between w-full">
+      <div className="relative z-10 pointer-events-none h-screen flex items-end pb-24">
+        <div className="pl-24 pr-12 flex items-end justify-between w-full">
           <div>
             <span className="label-chip mb-4">Material Props + Camera Rig</span>
             <h2 className="hero-text text-4xl md:text-5xl mb-2">

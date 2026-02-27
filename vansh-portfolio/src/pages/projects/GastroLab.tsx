@@ -4,11 +4,11 @@ import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import GastroLabScene from '@/components/canvas/projects/GastroLabScene';
-import CustomCursor from '@/components/CustomCursor';
+
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const GastroLab = () => {
-  const { setActiveAccent, setCursorStyle } = useThemeStore();
+  const { setActiveAccent } = useThemeStore();
   const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
@@ -17,21 +17,19 @@ const GastroLab = () => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    
+
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     });
-    
+
     setActiveAccent('orange');
-    setCursorStyle('gastro');
-    
+
     return () => {
       setActiveAccent(null);
-      setCursorStyle('default');
     };
-  }, [setActiveAccent, setCursorStyle]);
+  }, [setActiveAccent]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,8 +43,7 @@ const GastroLab = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background gastro-section cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen bg-background gastro-section">
       {/* Back Button */}
       <Link
         to="/"
@@ -74,7 +71,7 @@ const GastroLab = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div 
+      <div
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
         style={{ opacity: scrollIndicatorOpacity }}
       >
@@ -86,7 +83,7 @@ const GastroLab = () => {
 
       {/* Content Sections */}
       <div className="relative z-10 pointer-events-none">
-        <div className="h-screen flex items-end justify-center pb-32">
+        <div className="h-screen flex items-center justify-center">
           <div className="text-center">
             <span className="label-chip mb-4">GSAP Timeline + Scroll Linked</span>
             <h2 className="hero-text text-4xl md:text-6xl">The Dish</h2>

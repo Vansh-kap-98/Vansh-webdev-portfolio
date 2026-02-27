@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SmoothScroll from '@/components/SmoothScroll';
-import CustomCursor from '@/components/CustomCursor';
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Scene from '@/components/canvas/Scene';
 import { useContentStore } from '@/stores/contentStore';
-import { ArrowLeft, Mail, MapPin, Clock } from 'lucide-react';
+import { ArrowLeft, Mail, MapPin, Clock, Linkedin, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -42,12 +42,12 @@ const Contact = () => {
 
   return (
     <SmoothScroll>
-      <CustomCursor />
+
       <Scene />
-      
+
       <div className="relative z-10">
         <Header />
-        
+
         <main className="min-h-screen px-6 md:px-12 lg:px-20 py-32">
           {/* Back Button */}
           <button
@@ -207,13 +207,19 @@ const Contact = () => {
                   Follow Me
                 </h3>
                 <div className="flex gap-4">
-                  {['Twitter', 'LinkedIn', 'Dribbble', 'GitHub'].map((social) => (
+                  {[
+                    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/vansh-kapoor-03a7572a7/', icon: Linkedin },
+                    { name: 'GitHub', url: 'https://github.com/Vansh-kap-98', icon: Github },
+                  ].map((social) => (
                     <a
-                      key={social}
-                      href="#"
-                      className="w-12 h-12 rounded-full border border-border hover:border-foreground hover:bg-foreground/5 transition-all flex items-center justify-center font-mono text-[10px]"
+                      key={social.name}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-12 h-12 rounded-full border border-border hover:border-foreground hover:bg-foreground/5 transition-all flex items-center justify-center"
+                      title={social.name}
                     >
-                      {social.charAt(0)}
+                      <social.icon className="w-5 h-5 text-muted-foreground" />
                     </a>
                   ))}
                 </div>

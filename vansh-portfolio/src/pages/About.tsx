@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SmoothScroll from '@/components/SmoothScroll';
-import CustomCursor from '@/components/CustomCursor';
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Scene from '@/components/canvas/Scene';
@@ -10,10 +10,10 @@ import { ArrowLeft, Download, ExternalLink } from 'lucide-react';
 
 const About = () => {
   const navigate = useNavigate();
-  const { 
-    aboutPageHeading, 
-    aboutPageSubtext, 
-    aboutBackgroundText, 
+  const {
+    aboutPageHeading,
+    aboutPageSubtext,
+    aboutBackgroundText,
     aboutApproachText,
     aboutExpertise,
     aboutTechnologies,
@@ -26,12 +26,12 @@ const About = () => {
 
   return (
     <SmoothScroll>
-      <CustomCursor />
+
       <Scene />
-      
+
       <div className="relative z-10">
         <Header />
-        
+
         <main className="min-h-screen px-6 md:px-12 lg:px-20 py-32">
           {/* Back Button */}
           <button
@@ -67,8 +67,8 @@ const About = () => {
                 <ul className="space-y-3 text-muted-foreground">
                   {aboutExpertise.map((item, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <span 
-                        className="w-1.5 h-1.5 rounded-full mt-2" 
+                      <span
+                        className="w-1.5 h-1.5 rounded-full mt-2"
                         style={{ backgroundColor: item.color }}
                       />
                       <span>{item.text}</span>

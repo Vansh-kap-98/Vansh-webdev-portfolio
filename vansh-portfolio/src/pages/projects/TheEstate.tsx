@@ -4,38 +4,36 @@ import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import EstateScene from '@/components/canvas/projects/EstateScene';
-import CustomCursor from '@/components/CustomCursor';
+
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const TheEstate = () => {
-  const { setActiveAccent, setCursorStyle } = useThemeStore();
+  const { setActiveAccent } = useThemeStore();
   const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
     // Kill all ScrollTriggers
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    
+
     // Set theme
     setActiveAccent('teal');
-    setCursorStyle('estate');
-    
+
     // Force scroll to top
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    
+
     // Additional reset in next frame
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     });
-    
+
     return () => {
       setActiveAccent(null);
-      setCursorStyle('default');
     };
-  }, [setActiveAccent, setCursorStyle]);
+  }, [setActiveAccent]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,9 +48,8 @@ const TheEstate = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background cursor-none">
-      <CustomCursor />
-      
+    <div className="min-h-screen bg-background">
+
       {/* Back Button */}
       <Link
         to="/"
@@ -80,7 +77,7 @@ const TheEstate = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <div 
+      <div
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
         style={{ opacity: scrollIndicatorOpacity }}
       >
