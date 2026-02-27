@@ -1,108 +1,341 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState, useEffect, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useScroll, ScrollControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-// This component demonstrates an infinite tunnel gallery
-// Camera moves through a dark corridor with floating artworks
-const ArtifactsScene = () => {
-  const groupRef = useRef<THREE.Group>(null);
-  const scroll = useScroll();
+// ─── Painting Data ─────────────────────────────────────────────────────────────
+export const PAINTINGS = [
+  {
+    name: 'Starry Night',
+    artist: 'Vincent van Gogh',
+    description: 'A swirling night sky over a sleeping village, painted from memory by Van Gogh during his voluntary internment at the Saint-Paul-de-Mausole asylum. The turbulent clouds and radiant stars reflect his emotional turmoil and spiritual yearning.',
+    datePainted: 'June 1889',
+    cost: '$82,000,000',
+    dimensions: '73.7 × 92.1 cm',
+    medium: 'Oil on canvas',
+    location: 'MoMA, New York City',
+    copiesAvailable: 0,
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg',
+    accent: '#3b82f6',
+  },
+  {
+    name: 'The Night Watch',
+    artist: 'Rembrandt van Rijn',
+    description: "Rembrandt's monumental masterpiece depicts Captain Frans Banninck Cocq leading his civic militia. The radical use of light and shadow, with figures emerging dramatically from darkness, broke every convention of the formal group portrait and cemented Rembrandt's legacy as the master of chiaroscuro.",
+    datePainted: '1642',
+    cost: '$900,000,000',
+    dimensions: '363 × 437 cm',
+    medium: 'Oil on canvas',
+    location: 'Rijksmuseum, Amsterdam',
+    copiesAvailable: 0,
+    imageUrl: 'https://picsum.photos/seed/nightwatch/1280/960',
+    accent: '#f59e0b',
+  },
+  {
+    name: 'Girl with a Pearl Earring',
+    artist: 'Johannes Vermeer',
+    description: 'Called the "Mona Lisa of the North", this work is classified as a tronie — a study of an anonymous subject. The sitter is unknown, and her gaze over the shoulder with slightly parted lips creates an air of intimate mystery.',
+    datePainted: 'c. 1665',
+    cost: '$59,000,000',
+    dimensions: '44.5 × 39 cm',
+    medium: 'Oil on canvas',
+    location: 'Mauritshuis, The Hague',
+    copiesAvailable: 0,
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/800px-1665_Girl_with_a_Pearl_Earring.jpg',
+    accent: '#22d3ee',
+  },
+  {
+    name: 'The Great Wave',
+    artist: 'Katsushika Hokusai',
+    description: "Part of Hokusai's series Thirty-six Views of Mount Fuji, this woodblock print captures a colossal wave off the coast of Kanagawa. Mount Fuji sits small in the background, demonstrating nature's overwhelming power over mankind.",
+    datePainted: 'c. 1831',
+    cost: '$2,760,000',
+    dimensions: '25.7 × 37.9 cm',
+    medium: 'Woodblock print (ukiyo-e)',
+    location: 'Metropolitan Museum of Art, NY',
+    copiesAvailable: 100,
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/1280px-Tsunami_by_hokusai_19th_century.jpg',
+    accent: '#6366f1',
+  },
+  {
+    name: 'The Persistence of Memory',
+    artist: 'Salvador Dalí',
+    description: "Painted in a single afternoon while Camembert cheese melted on his table, Dalí's surrealist masterpiece explores the fluidity of time. The melting watches challenge the rigidity of time, referencing Einstein's theory of relativity.",
+    datePainted: '1931',
+    cost: '$70,000,000',
+    dimensions: '24 × 33 cm',
+    medium: 'Oil on canvas',
+    location: 'MoMA, New York City',
+    copiesAvailable: 0,
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/en/d/dd/The_Persistence_of_Memory.jpg',
+    accent: '#f97316',
+  },
+  {
+    name: 'Wanderer Above the Sea of Fog',
+    artist: 'Caspar David Friedrich',
+    description: "Friedrich's quintessential Romantic painting shows a man standing on a rocky precipice, surveying a fog-filled landscape below. The figure embodies the Sublime — humanity's awe before the overwhelming power of nature.",
+    datePainted: 'c. 1818',
+    cost: '$2,600,000',
+    dimensions: '94.8 × 74.8 cm',
+    medium: 'Oil on canvas',
+    location: 'Kunsthalle Hamburg, Germany',
+    copiesAvailable: 0,
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/800px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg',
+    accent: '#a3e635',
+  },
+];
 
-  // Generate artwork positions along the tunnel
-  const artworks = useMemo(() => {
-    const items = [];
-    const tunnelLength = 100;
-    const artworkCount = 20;
+export type Painting = typeof PAINTINGS[number];
 
-    for (let i = 0; i < artworkCount; i++) {
-      const z = -(i / artworkCount) * tunnelLength;
-      const side = i % 2 === 0 ? -3 : 3;
-      const y = 1 + Math.sin(i * 0.5) * 0.5;
+const TUNNEL_LENGTH = 80;
 
-      items.push({
-        position: [side, y, z] as [number, number, number],
-        rotation: [0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0] as [number, number, number],
-        color: `hsl(${(i * 30) % 360}, 50%, 50%)`,
-      });
+// Pre-load all textures at module level — no Suspense needed
+const textureLoader = new THREE.TextureLoader();
+textureLoader.crossOrigin = 'anonymous';
+const preloadedTextures: Record<string, THREE.Texture> = {};
+
+// Tiny 1×1 grey canvas used as fallback when an image URL fails
+const fallbackCanvas = document.createElement('canvas');
+fallbackCanvas.width = fallbackCanvas.height = 1;
+const fallbackCtx = fallbackCanvas.getContext('2d')!;
+fallbackCtx.fillStyle = '#3a3030';
+fallbackCtx.fillRect(0, 0, 1, 1);
+const FALLBACK_TEXTURE = new THREE.CanvasTexture(fallbackCanvas);
+
+PAINTINGS.forEach((p) => {
+  // Store the texture reference IMMEDIATELY — Three.js textures are live objects.
+  // The material holds this reference and Three.js auto-updates when the image
+  // data arrives (sets texture.needsUpdate = true internally).
+  // If we only stored it in the onLoad callback, fast-rendering meshes like the
+  // first painting would read undefined and never re-render when it resolves.
+  const tex = textureLoader.load(
+    p.imageUrl,
+    (loadedTex) => {
+      loadedTex.colorSpace = THREE.SRGBColorSpace;
+    },
+    undefined,
+    () => {
+      // On failure, swap this texture's image to the fallback canvas
+      console.warn(`[Artifacts] Failed to load: ${p.imageUrl}`);
+      tex.image = fallbackCanvas as unknown as HTMLImageElement;
+      tex.needsUpdate = true;
     }
+  );
+  preloadedTextures[p.imageUrl] = tex;
+});
 
-    return items;
-  }, []);
+// Shared gold frame material (created once)
+const goldFrameMaterialOuter = new THREE.MeshStandardMaterial({
+  color: new THREE.Color('#7a5c1e'),
+  metalness: 0.78,
+  roughness: 0.35,
+  envMapIntensity: 1.2,
+});
+const goldFrameMaterialInner = new THREE.MeshStandardMaterial({
+  color: new THREE.Color('#3d2b00'),
+  metalness: 0.5,
+  roughness: 0.65,
+});
+// Reusable white color for emissive tint
+const EMISSIVE_WHITE = new THREE.Color(1, 1, 1);
+
+// ─── Painting Mesh ────────────────────────────────────────────────────────────────
+const PaintingMesh = ({
+  painting,
+  position,
+  rotation,
+}: {
+  painting: Painting;
+  position: [number, number, number];
+  rotation: [number, number, number];
+}) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const matRef = useRef<THREE.MeshStandardMaterial>(null);
+  const scaleRef = useRef(1);
+  const emissiveVal = useRef(0);
+  const hoveredRef = useRef(false);
+  const paintingZ = position[2];
+
+  // ── Texture with React state so re-render fires when image arrives ──
+  const [texture, setTexture] = useState<THREE.Texture | undefined>(
+    () => preloadedTextures[painting.imageUrl]  // instant if already cached
+  );
+
+  useEffect(() => {
+    const cached = preloadedTextures[painting.imageUrl];
+    if (cached) {
+      setTexture(cached);
+      return;
+    }
+    // Not cached yet — load and update state when done
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin = 'anonymous';
+    loader.load(
+      painting.imageUrl,
+      (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        preloadedTextures[painting.imageUrl] = tex; // cache for reuse
+        setTexture(tex);
+      },
+      undefined,
+      () => {
+        console.warn(`[Artifacts] Failed to load: ${painting.imageUrl}`);
+        setTexture(FALLBACK_TEXTURE);
+      }
+    );
+  }, [painting.imageUrl]);
 
   useFrame(({ camera }) => {
-    if (!scroll) return;
+    // Scale lerp on hover
+    if (meshRef.current) {
+      const scaleTarget = hoveredRef.current ? 1.1 : 1.0;
+      scaleRef.current += (scaleTarget - scaleRef.current) * 0.1;
+      meshRef.current.scale.setScalar(scaleRef.current);
+    }
 
-    const scrollOffset = scroll.offset;
-    const tunnelLength = 100;
-
-    // Move camera through tunnel based on scroll
-    camera.position.z = -scrollOffset * tunnelLength * 0.8;
-    camera.position.y = 1.6;
-    camera.position.x = Math.sin(scrollOffset * Math.PI * 2) * 0.3;
-
-    // Add subtle camera sway
-    camera.lookAt(0, 1.6, camera.position.z - 10);
+    // Emissive proximity: painting glows evenly with no glare
+    if (matRef.current) {
+      const dist = Math.abs(camera.position.z - paintingZ);
+      // Full glow ≤4 units away, fades out by 14 units
+      const proximity = Math.max(0, 1 - Math.max(0, dist - 4) / 10);
+      const target = proximity * proximity * 0.72;  // 0 → 0.72 quadratic
+      const speed = target > emissiveVal.current ? 0.08 : 0.04;
+      emissiveVal.current += (target - emissiveVal.current) * speed;
+      matRef.current.emissiveIntensity = emissiveVal.current;
+    }
   });
 
   return (
-    <group ref={groupRef}>
-      {/* Fog for depth */}
-      <fog attach="fog" args={['#000000', 5, 30]} />
-
-      {/* Tunnel walls */}
-      <mesh position={[-5, 2, -50]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[100, 6]} />
-        <meshStandardMaterial color="#0a0a0a" side={THREE.DoubleSide} />
+    <group position={position} rotation={rotation}>
+      {/* Ornate Gold Frame */}
+      <mesh material={goldFrameMaterialOuter}>
+        <boxGeometry args={[2.48, 1.92, 0.10]} />
       </mesh>
-      <mesh position={[5, 2, -50]} rotation={[0, -Math.PI / 2, 0]}>
-        <planeGeometry args={[100, 6]} />
-        <meshStandardMaterial color="#0a0a0a" side={THREE.DoubleSide} />
+      {/* Inner shadow rebate */}
+      <mesh position={[0, 0, 0.04]} material={goldFrameMaterialInner}>
+        <boxGeometry args={[2.14, 1.62, 0.06]} />
       </mesh>
-
-      {/* Floor */}
-      <mesh position={[0, 0, -50]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[10, 100]} />
-        <meshStandardMaterial color="#050505" />
+      {/* Painting canvas — emissiveMap makes the whole surface glow uniformly */}
+      <mesh
+        ref={meshRef}
+        position={[0, 0, 0.08]}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          // Only show hover when the painting is visibly lit up
+          if (emissiveVal.current < 0.08) return;
+          hoveredRef.current = true;
+          document.body.style.cursor = 'pointer';
+          window.dispatchEvent(new CustomEvent('artifacts:hover', { detail: { painting } }));
+        }}
+        onPointerOut={() => {
+          hoveredRef.current = false;
+          document.body.style.cursor = 'auto';
+          window.dispatchEvent(new CustomEvent('artifacts:hover', { detail: { painting: null } }));
+        }}
+      >
+        <planeGeometry args={[2.0, 1.5]} />
+        <meshStandardMaterial
+          ref={matRef}
+          map={texture}
+          emissive={EMISSIVE_WHITE}
+          emissiveMap={texture}
+          emissiveIntensity={0}
+          roughness={0.85}
+        />
       </mesh>
-
-      {/* Ceiling */}
-      <mesh position={[0, 4, -50]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[10, 100]} />
-        <meshStandardMaterial color="#030303" />
+      {/* Wall-mount bar */}
+      <mesh position={[0, -1.02, -0.02]}>
+        <boxGeometry args={[0.5, 0.05, 0.05]} />
+        <meshStandardMaterial color="#1a1000" metalness={0.3} roughness={0.8} />
       </mesh>
-
-      {/* Artworks */}
-      {artworks.map((artwork, index) => (
-        <group key={index} position={artwork.position} rotation={artwork.rotation}>
-          {/* Frame */}
-          <mesh>
-            <boxGeometry args={[2.2, 1.7, 0.1]} />
-            <meshStandardMaterial color="#1a1a1a" />
-          </mesh>
-          {/* Artwork */}
-          <mesh position={[0, 0, 0.06]}>
-            <planeGeometry args={[2, 1.5]} />
-            <meshStandardMaterial color={artwork.color} emissive={artwork.color} emissiveIntensity={0.2} />
-          </mesh>
-          {/* Spotlight */}
-          <pointLight position={[0, 1, 0.5]} intensity={0.3} distance={3} color={artwork.color} />
-        </group>
-      ))}
-
-      {/* Ambient lighting */}
-      <ambientLight intensity={0.1} />
     </group>
   );
 };
 
-// Wrapper with ScrollControls
-const ArtifactsSceneWrapper = () => {
+// ─── Main Scene ────────────────────────────────────────────────────────────────
+const ArtifactsScene = () => {
+  const scroll = useScroll();
+  const frameCount = useRef(0);
+
+  const artworks = useMemo(() =>
+    PAINTINGS.map((painting, i) => {
+      const t = i / (PAINTINGS.length - 1);
+      const side = i % 2 === 0 ? -3.1 : 3.1;
+      return {
+        painting,
+        position: [side, 1.65, -t * TUNNEL_LENGTH] as [number, number, number],
+        rotation: [0, side > 0 ? -Math.PI / 9 : Math.PI / 9, 0] as [number, number, number],
+      };
+    }),
+    []);
+
+  useFrame(({ camera }) => {
+    if (!scroll) return;
+    const t = scroll.offset;
+    camera.position.z = -t * TUNNEL_LENGTH * 0.92;
+    camera.position.y = 1.65;
+    camera.position.x = Math.sin(t * Math.PI * 2) * 0.2;
+    camera.lookAt(camera.position.x * 0.3, 1.65, camera.position.z - 10);
+
+    frameCount.current++;
+    if (frameCount.current % 3 === 0) {
+      window.dispatchEvent(new CustomEvent('artifacts:scroll', { detail: { offset: t } }));
+    }
+  });
+
   return (
-    <ScrollControls pages={5} damping={0.1}>
-      <ArtifactsScene />
-    </ScrollControls>
+    <group>
+      <fog attach="fog" args={['#0e0508', 5, 36]} />
+
+      {/* Base ambient — paintings self-illuminate via emissive, walls just need fill */}
+      <ambientLight intensity={0.2} color="#ffe8cc" />
+      {/* Warm overhead fill */}
+      <directionalLight position={[0, 8, 0]} intensity={0.35} color="#ffd6a0" />
+      {/* Cool front rim */}
+      <directionalLight position={[0, 2, 10]} intensity={0.12} color="#c8d8ff" />
+      {/* Mid-tunnel path light */}
+      <pointLight position={[0, 2, -TUNNEL_LENGTH / 2]} intensity={0.5} distance={60} color="#ff9944" decay={1} />
+
+      {/* ── Louvre-like walls: deep burgundy/wine ── */}
+      <mesh position={[-4.5, 2, -TUNNEL_LENGTH / 2]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[TUNNEL_LENGTH, 6]} />
+        <meshStandardMaterial color="#1c0a0d" roughness={0.92} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[4.5, 2, -TUNNEL_LENGTH / 2]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[TUNNEL_LENGTH, 6]} />
+        <meshStandardMaterial color="#1c0a0d" roughness={0.92} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Dark marble floor */}
+      <mesh position={[0, -0.01, -TUNNEL_LENGTH / 2]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[9, TUNNEL_LENGTH]} />
+        <meshStandardMaterial color="#0d0608" roughness={0.2} metalness={0.4} />
+      </mesh>
+      {/* Ceiling */}
+      <mesh position={[0, 5.01, -TUNNEL_LENGTH / 2]} rotation={[Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[9, TUNNEL_LENGTH]} />
+        <meshStandardMaterial color="#0a0305" roughness={0.95} />
+      </mesh>
+
+
+      {artworks.map((art, i) => (
+        <PaintingMesh
+          key={i}
+          painting={art.painting}
+          position={art.position}
+          rotation={art.rotation}
+        />
+      ))}
+    </group>
   );
 };
+
+// ─── Wrapper ───────────────────────────────────────────────────────────────────
+const ArtifactsSceneWrapper = () => (
+  <Suspense fallback={null}>
+    <ScrollControls pages={4} damping={0.3}>
+      <ArtifactsScene />
+    </ScrollControls>
+  </Suspense>
+);
 
 export default ArtifactsSceneWrapper;
