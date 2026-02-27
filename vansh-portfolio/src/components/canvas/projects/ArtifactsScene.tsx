@@ -8,79 +8,79 @@ export const PAINTINGS = [
   {
     name: 'Starry Night',
     artist: 'Vincent van Gogh',
-    description: 'A swirling night sky over a sleeping village, painted from memory by Van Gogh during his voluntary internment at the Saint-Paul-de-Mausole asylum. The turbulent clouds and radiant stars reflect his emotional turmoil and spiritual yearning.',
+    description: 'A swirling night sky over a sleeping village, painted from memory by Van Gogh during his voluntary internment at the Saint-Paul-de-Mausole asylum.',
     datePainted: 'June 1889',
     cost: '$82,000,000',
     dimensions: '73.7 × 92.1 cm',
     medium: 'Oil on canvas',
     location: 'MoMA, New York City',
     copiesAvailable: 0,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg',
+    imageUrl: 'https://picsum.photos/seed/starry/800/600',
     accent: '#3b82f6',
   },
   {
     name: 'The Night Watch',
     artist: 'Rembrandt van Rijn',
-    description: "Rembrandt's monumental masterpiece depicts Captain Frans Banninck Cocq leading his civic militia. The radical use of light and shadow, with figures emerging dramatically from darkness, broke every convention of the formal group portrait and cemented Rembrandt's legacy as the master of chiaroscuro.",
+    description: "Rembrandt's monumental masterpiece depicts Captain Frans Banninck Cocq leading his civic militia.",
     datePainted: '1642',
     cost: '$900,000,000',
     dimensions: '363 × 437 cm',
     medium: 'Oil on canvas',
     location: 'Rijksmuseum, Amsterdam',
     copiesAvailable: 0,
-    imageUrl: 'https://picsum.photos/seed/nightwatch/1280/960',
+    imageUrl: 'https://picsum.photos/seed/nightwatch/800/960',
     accent: '#f59e0b',
   },
   {
     name: 'Girl with a Pearl Earring',
     artist: 'Johannes Vermeer',
-    description: 'Called the "Mona Lisa of the North", this work is classified as a tronie — a study of an anonymous subject. The sitter is unknown, and her gaze over the shoulder with slightly parted lips creates an air of intimate mystery.',
+    description: 'Called the "Mona Lisa of the North", this work is classified as a tronie — a study of an anonymous subject.',
     datePainted: 'c. 1665',
     cost: '$59,000,000',
     dimensions: '44.5 × 39 cm',
     medium: 'Oil on canvas',
     location: 'Mauritshuis, The Hague',
     copiesAvailable: 0,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/800px-1665_Girl_with_a_Pearl_Earring.jpg',
+    imageUrl: 'https://picsum.photos/seed/pearl/800/1000',
     accent: '#22d3ee',
   },
   {
     name: 'The Great Wave',
     artist: 'Katsushika Hokusai',
-    description: "Part of Hokusai's series Thirty-six Views of Mount Fuji, this woodblock print captures a colossal wave off the coast of Kanagawa. Mount Fuji sits small in the background, demonstrating nature's overwhelming power over mankind.",
+    description: "Part of Hokusai's series Thirty-six Views of Mount Fuji, this woodblock print captures a colossal wave.",
     datePainted: 'c. 1831',
     cost: '$2,760,000',
     dimensions: '25.7 × 37.9 cm',
     medium: 'Woodblock print (ukiyo-e)',
     location: 'Metropolitan Museum of Art, NY',
     copiesAvailable: 100,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/1280px-Tsunami_by_hokusai_19th_century.jpg',
+    imageUrl: 'https://picsum.photos/seed/wave/1000/700',
     accent: '#6366f1',
   },
   {
     name: 'The Persistence of Memory',
     artist: 'Salvador Dalí',
-    description: "Painted in a single afternoon while Camembert cheese melted on his table, Dalí's surrealist masterpiece explores the fluidity of time. The melting watches challenge the rigidity of time, referencing Einstein's theory of relativity.",
+    description: "Dalí's surrealist masterpiece explores the fluidity of time.",
     datePainted: '1931',
     cost: '$70,000,000',
     dimensions: '24 × 33 cm',
     medium: 'Oil on canvas',
     location: 'MoMA, New York City',
     copiesAvailable: 0,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/en/d/dd/The_Persistence_of_Memory.jpg',
+    imageUrl: 'https://picsum.photos/seed/dali/800/600',
     accent: '#f97316',
   },
   {
     name: 'Wanderer Above the Sea of Fog',
     artist: 'Caspar David Friedrich',
-    description: "Friedrich's quintessential Romantic painting shows a man standing on a rocky precipice, surveying a fog-filled landscape below. The figure embodies the Sublime — humanity's awe before the overwhelming power of nature.",
+    description: "Friedrich's quintessential Romantic painting shows a man standing on a rocky precipice.",
     datePainted: 'c. 1818',
     cost: '$2,600,000',
     dimensions: '94.8 × 74.8 cm',
     medium: 'Oil on canvas',
     location: 'Kunsthalle Hamburg, Germany',
     copiesAvailable: 0,
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/800px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg',
+    imageUrl: 'https://picsum.photos/seed/fog/800/1000',
     accent: '#a3e635',
   },
 ];
@@ -124,20 +124,65 @@ PAINTINGS.forEach((p) => {
   preloadedTextures[p.imageUrl] = tex;
 });
 
-// Shared gold frame material (created once)
+// ─── Materials ─────────────────────────────────────────────────────────────
 const goldFrameMaterialOuter = new THREE.MeshStandardMaterial({
-  color: new THREE.Color('#7a5c1e'),
-  metalness: 0.78,
-  roughness: 0.35,
-  envMapIntensity: 1.2,
+  color: new THREE.Color('#94712b'), // Richer gold
+  metalness: 0.9,
+  roughness: 0.2, // Smoother for better highlights
+  envMapIntensity: 1.5,
 });
+
 const goldFrameMaterialInner = new THREE.MeshStandardMaterial({
   color: new THREE.Color('#3d2b00'),
-  metalness: 0.5,
-  roughness: 0.65,
+  metalness: 0.6,
+  roughness: 0.5,
 });
+
+const goldFrameMaterialDetail = new THREE.MeshStandardMaterial({
+  color: new THREE.Color('#b58e3d'), // Brighter detail gold
+  metalness: 1.0,
+  roughness: 0.1,
+});
+
 // Reusable white color for emissive tint
 const EMISSIVE_WHITE = new THREE.Color(1, 1, 1);
+
+// ─── Ornate Frame Sub-component ──────────────────────────────────────────────────
+const OrnateFrame = () => {
+  return (
+    <group>
+      {/* 1. Outer Tier (Deepest) */}
+      <mesh material={goldFrameMaterialOuter}>
+        <boxGeometry args={[2.6, 2.05, 0.12]} />
+      </mesh>
+
+      {/* 2. Middle "Cove" Molding */}
+      <mesh position={[0, 0, 0.04]} material={goldFrameMaterialInner}>
+        <boxGeometry args={[2.3, 1.75, 0.08]} />
+      </mesh>
+
+      {/* 3. Sub-tier detail */}
+      <mesh position={[0, 0, 0.06]} material={goldFrameMaterialDetail}>
+        <boxGeometry args={[2.35, 1.8, 0.02]} />
+      </mesh>
+
+      {/* 4. Inner Fillet (Adjacent to canvas) */}
+      <mesh position={[0, 0, 0.08]} material={goldFrameMaterialOuter}>
+        <boxGeometry args={[2.1, 1.58, 0.04]} />
+      </mesh>
+
+      {/* Decorative Corner Ornaments */}
+      {[
+        [-1.2, 0.925], [1.2, 0.925], [-1.2, -0.925], [1.2, -0.925]
+      ].map(([x, y], i) => (
+        <mesh key={i} position={[x as number, y as number, 0.08]} material={goldFrameMaterialDetail}>
+          <boxGeometry args={[0.2, 0.25, 0.05]} />
+        </mesh>
+      ))}
+    </group>
+  );
+};
+
 
 // ─── Painting Mesh ────────────────────────────────────────────────────────────────
 const PaintingMesh = ({
@@ -207,18 +252,13 @@ const PaintingMesh = ({
 
   return (
     <group position={position} rotation={rotation}>
-      {/* Ornate Gold Frame */}
-      <mesh material={goldFrameMaterialOuter}>
-        <boxGeometry args={[2.48, 1.92, 0.10]} />
-      </mesh>
-      {/* Inner shadow rebate */}
-      <mesh position={[0, 0, 0.04]} material={goldFrameMaterialInner}>
-        <boxGeometry args={[2.14, 1.62, 0.06]} />
-      </mesh>
+      {/* Ornate Layered Frame */}
+      <OrnateFrame />
+
       {/* Painting canvas — emissiveMap makes the whole surface glow uniformly */}
       <mesh
         ref={meshRef}
-        position={[0, 0, 0.08]}
+        position={[0, 0, 0.11]}
         onPointerOver={(e) => {
           e.stopPropagation();
           // Only show hover when the painting is visibly lit up
@@ -236,6 +276,7 @@ const PaintingMesh = ({
         <planeGeometry args={[2.0, 1.5]} />
         <meshStandardMaterial
           ref={matRef}
+          color="#000000"
           map={texture}
           emissive={EMISSIVE_WHITE}
           emissiveMap={texture}
