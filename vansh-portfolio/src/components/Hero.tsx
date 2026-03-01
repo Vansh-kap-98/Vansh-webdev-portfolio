@@ -146,11 +146,6 @@ const Hero = () => {
         <span className="mx-2">/</span>
         <span>{heroCornerLabel}</span>
       </div>
-      <div className="absolute top-16 right-8 font-mono text-[10px] text-muted-foreground tracking-widest">
-        <span>{heroCornerSublabel}</span>
-        <span className="mx-2">—</span>
-        <span className="opacity-50">2026</span>
-      </div>
 
       {/* WhatsApp CTA Button */}
       <a

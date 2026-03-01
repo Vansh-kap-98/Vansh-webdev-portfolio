@@ -16,220 +16,107 @@ const CustomCursor = () => {
 
     if (!cursor || !ring) return;
 
-    const pos = { x: 0, y: 0 };
-    const mouse = { x: 0, y: 0 };
-    const speed = 0.15;
+    // Set centering via GSAP once to avoid conflict with x/y quickSetters
+    gsap.set([cursor, ring], {
+      xPercent: -50,
+      yPercent: -50,
+      force3D: true
+    });
 
-    const updateCursor = (e: MouseEvent) => {
+    // Use GSAP quickSetter for high-performance updates
+    const xSetDot = gsap.quickSetter(cursor, "x", "px");
+    const ySetDot = gsap.quickSetter(cursor, "y", "px");
+    const xSetRing = gsap.quickSetter(ring, "x", "px");
+    const ySetRing = gsap.quickSetter(ring, "y", "px");
+
+    const pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const mouse = { x: pos.x, y: pos.y };
+    const speed = 0.2;
+
+    const updatePosition = (e: MouseEvent) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
-      setIsVisible(true);
+      if (!isVisible) setIsVisible(true);
     };
 
     const animate = () => {
       pos.x += (mouse.x - pos.x) * speed;
       pos.y += (mouse.y - pos.y) * speed;
 
-      cursor.style.left = `${pos.x}px`;
-      cursor.style.top = `${pos.y}px`;
-      ring.style.left = `${pos.x}px`;
-      ring.style.top = `${pos.y}px`;
+      // Update dot directly to mouse position
+      xSetDot(mouse.x);
+      ySetDot(mouse.y);
+
+      // Update ring with smoothed position
+      xSetRing(pos.x);
+      ySetRing(pos.y);
 
       requestAnimationFrame(animate);
     };
 
-    window.addEventListener('mousemove', updateCursor);
+    window.addEventListener('mousemove', updatePosition);
     window.addEventListener('mouseenter', () => setIsVisible(true));
     window.addEventListener('mouseleave', () => setIsVisible(false));
-    animate();
+
+    const ticker = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener('mousemove', updateCursor);
+      window.removeEventListener('mousemove', updatePosition);
+      cancelAnimationFrame(ticker);
     };
-  }, []);
+  }, []); // Remove isVisible dependency to prevent effect re-runs
 
   useEffect(() => {
     const ring = cursorRingRef.current;
     if (!ring) return;
 
     if (cursorVariant === 'project') {
-      gsap.to(ring, {
-        width: 80,
-        height: 80,
-        opacity: 1,
-        duration: 0.3,
-        ease: 'power2.out',
-      });
+      gsap.to(ring, { width: 80, height: 80, opacity: 1, duration: 0.3, ease: 'power2.out' });
     } else if (cursorVariant === 'hover') {
-      gsap.to(ring, {
-        width: 50,
-        height: 50,
-        opacity: 1,
-        duration: 0.3,
-        ease: 'power2.out',
-      });
+      gsap.to(ring, { width: 50, height: 50, opacity: 1, duration: 0.3, ease: 'power2.out' });
     } else {
-      gsap.to(ring, {
-        width: 0,
-        height: 0,
-        opacity: 0,
-        duration: 0.3,
-        ease: 'power2.out',
-      });
+      gsap.to(ring, { width: 0, height: 0, opacity: 0, duration: 0.3, ease: 'power2.out' });
     }
   }, [cursorVariant]);
 
-  const getRingStyle = () => {
-    const baseStyle: React.CSSProperties = {
-      width: 0,
-      height: 0,
-      transform: 'translate(-50%, -50%)',
-      opacity: 0,
-    };
-
-    switch (styleConfig.ringStyle) {
-      case 'square':
-        return { ...baseStyle, borderRadius: '4px', border: `2px solid ${styleConfig.ringColor}` };
-      case 'diamond':
-        return { ...baseStyle, borderRadius: '4px', border: `2px solid ${styleConfig.ringColor}`, rotate: '45deg' };
-      case 'crosshair':
-        return { ...baseStyle, borderRadius: '0', border: 'none' };
-      case 'hexagon':
-        return { ...baseStyle, borderRadius: '12px', border: `2px solid ${styleConfig.ringColor}` };
-      case 'triangle':
-        return { ...baseStyle, borderRadius: '0', border: 'none' };
-      default:
-        return { ...baseStyle, borderRadius: '50%', border: `1px solid ${styleConfig.ringColor}` };
-    }
-  };
-
-  const getDotStyle = (): React.CSSProperties => {
-    const baseStyle: React.CSSProperties = {
-      width: styleConfig.dotSize,
-      height: styleConfig.dotSize,
-      backgroundColor: styleConfig.dotColor,
-      transform: 'translate(-50%, -50%)',
-      opacity: isVisible ? 1 : 0,
-      transition: 'opacity 0.2s, background-color 0.3s',
-    };
-
-    switch (styleConfig.ringStyle) {
-      case 'square':
-        return { ...baseStyle, borderRadius: '2px' };
-      case 'diamond':
-        return { ...baseStyle, borderRadius: '2px', rotate: '45deg' };
-      case 'crosshair':
-        return { ...baseStyle, borderRadius: '0', width: 2, height: styleConfig.dotSize * 3 };
-      default:
-        return { ...baseStyle, borderRadius: '50%' };
-    }
-  };
-
-  const renderCrosshairExtra = () => {
-    if (styleConfig.ringStyle !== 'crosshair') return null;
-    return (
-      <div
-        className="fixed pointer-events-none z-[9997]"
-        style={{
-          left: cursorRef.current?.style.left,
-          top: cursorRef.current?.style.top,
-          width: styleConfig.dotSize * 3,
-          height: 2,
-          backgroundColor: styleConfig.dotColor,
-          transform: 'translate(-50%, -50%)',
-          opacity: isVisible ? 1 : 0,
-          transition: 'opacity 0.2s',
-        }}
-      />
-    );
-  };
-
-  const renderTriangleRing = () => {
-    if (styleConfig.ringStyle !== 'triangle') return null;
-    return (
-      <svg
-        className="fixed pointer-events-none z-[9997]"
-        style={{
-          left: cursorRingRef.current?.style.left,
-          top: cursorRingRef.current?.style.top,
-          width: 60,
-          height: 60,
-          transform: 'translate(-50%, -50%)',
-          opacity: cursorVariant === 'project' || cursorVariant === 'hover' ? 0.8 : 0,
-          transition: 'opacity 0.3s',
-        }}
-        viewBox="0 0 60 60"
-      >
-        <polygon
-          points="30,5 55,50 5,50"
-          fill="none"
-          stroke={styleConfig.ringColor}
-          strokeWidth="2"
-        />
-      </svg>
-    );
-  };
-
-  const renderHexagonRing = () => {
-    if (styleConfig.ringStyle !== 'hexagon') return null;
-    const size = cursorVariant === 'project' ? 80 : cursorVariant === 'hover' ? 50 : 0;
-    return (
-      <svg
-        className="fixed pointer-events-none z-[9997]"
-        style={{
-          left: cursorRingRef.current?.style.left,
-          top: cursorRingRef.current?.style.top,
-          width: size,
-          height: size,
-          transform: 'translate(-50%, -50%)',
-          opacity: cursorVariant === 'project' || cursorVariant === 'hover' ? 0.8 : 0,
-          transition: 'all 0.3s ease-out',
-        }}
-        viewBox="0 0 100 100"
-      >
-        <polygon
-          points="50,3 93,25 93,75 50,97 7,75 7,25"
-          fill="none"
-          stroke={styleConfig.ringColor}
-          strokeWidth="3"
-        />
-      </svg>
-    );
+  const baseContainerStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    pointerEvents: 'none',
+    zIndex: 9999,
+    willChange: 'transform',
   };
 
   return (
     <>
-      {/* Main dot cursor */}
+      {/* Main Dot - Follows mouse instantly */}
       <div
         ref={cursorRef}
-        className="custom-cursor fixed pointer-events-none z-[9999] mix-blend-difference"
-        style={getDotStyle()}
+        style={{
+          ...baseContainerStyle,
+          width: styleConfig.dotSize,
+          height: styleConfig.dotSize,
+          backgroundColor: styleConfig.dotColor,
+          borderRadius: styleConfig.ringStyle === 'square' || styleConfig.ringStyle === 'diamond' ? '2px' : '50%',
+          opacity: isVisible ? 1 : 0,
+          mixBlendMode: 'difference',
+        }}
       />
-      {/* Crosshair horizontal line */}
-      {styleConfig.ringStyle === 'crosshair' && (
-        <div
-          className="fixed pointer-events-none z-[9998] mix-blend-difference"
-          style={{
-            left: cursorRef.current?.style.left || 0,
-            top: cursorRef.current?.style.top || 0,
-            width: styleConfig.dotSize * 3,
-            height: 2,
-            backgroundColor: styleConfig.dotColor,
-            transform: 'translate(-50%, -50%)',
-            opacity: isVisible ? 1 : 0,
-            transition: 'opacity 0.2s',
-          }}
-        />
-      )}
-      {/* Expanding ring */}
+
+      {/* Lagging Ring - Follows with LERP */}
       <div
         ref={cursorRingRef}
-        className="custom-cursor fixed pointer-events-none z-[9998]"
-        style={getRingStyle()}
+        style={{
+          ...baseContainerStyle,
+          width: 0,
+          height: 0,
+          border: `1px solid ${styleConfig.ringColor}`,
+          borderRadius: styleConfig.ringStyle === 'square' ? '4px' : '50%',
+          opacity: 0,
+          zIndex: 9998,
+        }}
       />
-      {/* Special shape rings */}
-      {renderTriangleRing()}
-      {renderHexagonRing()}
     </>
   );
 };
