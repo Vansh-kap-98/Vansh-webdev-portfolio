@@ -91,7 +91,7 @@ const WorkGrid = () => {
   };
 
   return (
-    <section id="work" className="relative py-section px-6 md:px-12 lg:px-20">
+    <section id="work" className="relative py-section pt-8 md:pt-10 lg:pt-12 px-6 md:px-12 lg:px-20">
       {/* Section Header */}
       <div className="mb-16 flex items-end justify-between border-b border-border pb-8">
         <div>

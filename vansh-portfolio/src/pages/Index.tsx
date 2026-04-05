@@ -5,6 +5,7 @@ import SmoothScroll from '@/components/SmoothScroll';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
+import DeployedWebsites from '@/components/DeployedWebsites';
 import WorkGrid from '@/components/WorkGrid';
 import Footer from '@/components/Footer';
 import { useThemeStore, accentColors } from '@/stores/themeStore';
@@ -50,6 +51,7 @@ const Index = () => {
         <main>
           <Hero />
           <About />
+          <DeployedWebsites />
           <WorkGrid />
         </main>
         <Footer />
