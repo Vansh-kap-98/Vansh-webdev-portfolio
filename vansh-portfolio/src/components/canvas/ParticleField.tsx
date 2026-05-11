@@ -7,7 +7,7 @@ const ParticleField = () => {
   const mouseRef = useRef({ x: 0, y: 0 });
   const { viewport } = useThree();
 
-  const count = 2000;
+  const count = 1200;
 
   const [positions, velocities, alphas, alphaVelocities] = useMemo(() => {
     const positions = new Float32Array(count * 3);

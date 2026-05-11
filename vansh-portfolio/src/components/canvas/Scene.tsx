@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment } from '@react-three/drei';
 import ParticleField from './ParticleField';
 import { useThemeStore, accentColors } from '@/stores/themeStore';
 
@@ -25,13 +24,12 @@ const Scene = () => {
     <div className="fixed inset-0 z-0">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
-        gl={{ antialias: true, alpha: true }}
-        dpr={[1, 2]}
+        gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
+        dpr={[1, 1.35]}
       >
         <Suspense fallback={null}>
           <AmbientLight />
           <ParticleField />
-          <Environment preset="night" />
         </Suspense>
       </Canvas>
     </div>

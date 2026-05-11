@@ -11,6 +11,9 @@ export interface Project {
   accentColor: AccentColor;
   year: string;
   description: string;
+  thumbnailEyebrow: string;
+  thumbnailTitle: string;
+  thumbnailCopy: string;
 }
 
 const projects: Project[] = [
@@ -23,6 +26,9 @@ const projects: Project[] = [
     accentColor: 'teal',
     year: '2026',
     description: 'Scroll-based camera flythrough from aerial to interior views',
+    thumbnailEyebrow: 'ScrollControls + CatmullRomCurve3',
+    thumbnailTitle: 'Aerial View',
+    thumbnailCopy: 'Scroll-based camera flythrough from aerial to interior views',
   },
   {
     id: 'gastro-lab',
@@ -33,6 +39,9 @@ const projects: Project[] = [
     accentColor: 'orange',
     year: '2026',
     description: 'Exploded view product showcase revealing dish layers',
+    thumbnailEyebrow: 'GSAP Timeline + Scroll Linked',
+    thumbnailTitle: 'The Dish',
+    thumbnailCopy: 'Exploded view product showcase revealing dish layers',
   },
   {
     id: 'void-streetwear',
@@ -43,6 +52,9 @@ const projects: Project[] = [
     accentColor: 'neon',
     year: '2026',
     description: 'Physics-based cloth that deforms with mouse interaction',
+    thumbnailEyebrow: 'Cloth Simulation + Vertex Shader',
+    thumbnailTitle: 'Feel the Movement',
+    thumbnailCopy: 'Physics-based cloth that deforms with mouse interaction',
   },
   {
     id: 'neurocore',
@@ -53,6 +65,9 @@ const projects: Project[] = [
     accentColor: 'purple',
     year: '2026',
     description: 'Particles morph into icons as users scroll through features',
+    thumbnailEyebrow: 'InstancedMesh + Particle Morphing',
+    thumbnailTitle: 'Data Cloud',
+    thumbnailCopy: 'Particles morph into icons as users scroll through features',
   },
   {
     id: 'velocity-ev',
@@ -63,6 +78,9 @@ const projects: Project[] = [
     accentColor: 'gold',
     year: '2026',
     description: 'Real-time customization with interior camera transitions',
+    thumbnailEyebrow: 'V2.1 PRO',
+    thumbnailTitle: 'Velocity GT',
+    thumbnailCopy: 'Real-time customization with interior camera transitions',
   },
   {
     id: 'artifacts',
@@ -73,6 +91,9 @@ const projects: Project[] = [
     accentColor: 'cyan',
     year: '2026',
     description: 'Infinite tunnel gallery with floating artworks and fog',
+    thumbnailEyebrow: 'Classical Gallery',
+    thumbnailTitle: 'Enter the Infinite',
+    thumbnailCopy: 'Infinite tunnel gallery with floating artworks and fog',
   },
 ];
 
