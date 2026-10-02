@@ -4,6 +4,13 @@ import { useContentStore } from '@/stores/contentStore';
 import gsap from 'gsap';
 import AsteroidsEasterEgg from './AsteroidsEasterEgg';
 
+const NAV_LINKS = [
+  { label: 'Work', href: '/#work' },
+  { label: 'About', href: '/about' },
+  { label: 'Process', href: '/process' },
+  { label: 'Contact', href: '/contact' },
+];
+
 const Header = () => {
   const { headerLogo } = useContentStore();
   const navRef = useRef<HTMLDivElement>(null);
@@ -12,6 +19,7 @@ const Header = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isEasterEggActive, setIsEasterEggActive] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [launchRect, setLaunchRect] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
   const lastScrollY = useRef(0);
   const wipButtonRef = useRef<HTMLButtonElement>(null);
@@ -64,7 +72,13 @@ const Header = () => {
       <header
         ref={headerRef}
         className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-6 transition-all duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
-          } ${isScrolled ? 'bg-white shadow-md' : 'mix-blend-difference'
+          } ${isScrolled
+            ? 'bg-white shadow-md'
+            : isMenuOpen
+              // mix-blend-difference would make the open panel unreadable over the hero,
+              // so the menu gets its own surface instead.
+              ? 'bg-background/95 backdrop-blur-md border-b border-border'
+              : 'mix-blend-difference'
           }`}
       >
         <nav
@@ -84,42 +98,18 @@ const Header = () => {
 
           {/* Nav Links */}
           <div className="hidden md:flex items-center gap-8">
-            <a
-              href="/#work"
-              className={`font-mono text-[11px] tracking-widest transition-colors uppercase ${isScrolled ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
-                }`}
-              onMouseEnter={(e) => handleMouseEnter(e)}
-              onMouseLeave={(e) => handleMouseLeave(e)}
-            >
-              Work
-            </a>
-            <a
-              href="/about"
-              className={`font-mono text-[11px] tracking-widest transition-colors uppercase ${isScrolled ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
-                }`}
-              onMouseEnter={(e) => handleMouseEnter(e)}
-              onMouseLeave={(e) => handleMouseLeave(e)}
-            >
-              About
-            </a>
-            <a
-              href="/process"
-              className={`font-mono text-[11px] tracking-widest transition-colors uppercase ${isScrolled ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
-                }`}
-              onMouseEnter={(e) => handleMouseEnter(e)}
-              onMouseLeave={(e) => handleMouseLeave(e)}
-            >
-              Process
-            </a>
-            <a
-              href="/contact"
-              className={`font-mono text-[11px] tracking-widest transition-colors uppercase ${isScrolled ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
-                }`}
-              onMouseEnter={(e) => handleMouseEnter(e)}
-              onMouseLeave={(e) => handleMouseLeave(e)}
-            >
-              Contact
-            </a>
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className={`font-mono text-[11px] tracking-widest transition-colors uppercase ${isScrolled ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
+                  }`}
+                onMouseEnter={(e) => handleMouseEnter(e)}
+                onMouseLeave={(e) => handleMouseLeave(e)}
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
 
           {/* CTA Button */}
@@ -191,11 +181,59 @@ const Header = () => {
           `}</style>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden flex flex-col gap-1.5">
-            <span className={`w-6 h-px ${isScrolled ? 'bg-black' : 'bg-foreground'}`} />
-            <span className={`w-4 h-px ${isScrolled ? 'bg-black' : 'bg-foreground'}`} />
+          <button
+            type="button"
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen((open) => !open)}
+            className="md:hidden flex flex-col justify-center gap-1.5 w-8 h-8 items-end"
+          >
+            <span
+              className={`h-px transition-all duration-300 ${isScrolled ? 'bg-black' : 'bg-foreground'} ${
+                isMenuOpen ? 'w-6 translate-y-[3.5px] rotate-45' : 'w-6'
+              }`}
+            />
+            <span
+              className={`h-px transition-all duration-300 ${isScrolled ? 'bg-black' : 'bg-foreground'} ${
+                isMenuOpen ? 'w-6 -translate-y-[3.5px] -rotate-45' : 'w-4'
+              }`}
+            />
           </button>
         </nav>
+
+        {/* Mobile Nav Panel */}
+        <div
+          className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${
+            isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="flex flex-col gap-1 pt-6 pb-2">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={() => setIsMenuOpen(false)}
+                className={`font-mono text-[13px] tracking-widest uppercase py-3 border-b transition-colors ${
+                  isScrolled
+                    ? 'text-black/70 hover:text-black border-black/10'
+                    : 'text-foreground/80 hover:text-foreground border-foreground/10'
+                }`}
+              >
+                {link.label}
+              </a>
+            ))}
+            <a
+              href="/Vansh_Kapoor_Resume.pdf"
+              download="Vansh_Kapoor_Resume.pdf"
+              onClick={() => setIsMenuOpen(false)}
+              className={`font-mono text-[13px] tracking-widest uppercase py-3 transition-colors ${
+                isScrolled ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
+              }`}
+            >
+              Resume ↓
+            </a>
+          </div>
+        </div>
       </header>
 
       {isEasterEggActive && launchRect && (

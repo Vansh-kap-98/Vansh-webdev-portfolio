@@ -23,12 +23,32 @@ const Contact = () => {
 
 
 
+  const [sent, setSent] = useState(false);
+
+  // No backend is wired up, so the form hands off to the visitor's mail client
+  // with everything already filled in. Swap this for a POST to a form service
+  // (Formspree / Resend / a serverless route) if you want submissions captured
+  // server-side instead.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
-    alert('Thank you for your message! I will get back to you soon.');
-    setFormData({ name: '', email: '', company: '', message: '' });
+
+    const subject = `Project enquiry from ${formData.name}`;
+    const body = [
+      `Name: ${formData.name}`,
+      `Email: ${formData.email}`,
+      formData.company ? `Company: ${formData.company}` : null,
+      '',
+      formData.message,
+    ]
+      .filter((line) => line !== null)
+      .join('\n');
+
+    window.location.href =
+      `mailto:${contactEmail}` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`;
+
+    setSent(true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -133,13 +153,33 @@ const Contact = () => {
                   />
                 </div>
 
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full md:w-auto px-8 font-mono text-[10px] tracking-widest uppercase"
-                >
-                  Send Message
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full md:w-auto px-8 font-mono text-[10px] tracking-widest uppercase"
+                  >
+                    Send Message
+                  </Button>
+
+                  <p className="font-mono text-[10px] text-muted-foreground tracking-wider leading-relaxed">
+                    {sent ? (
+                      <>
+                        Your mail app should have opened with the message ready to send. If it
+                        didn't, write to{' '}
+                        <a
+                          href={`mailto:${contactEmail}`}
+                          className="text-foreground hover:underline"
+                        >
+                          {contactEmail}
+                        </a>{' '}
+                        directly.
+                      </>
+                    ) : (
+                      <>Opens in your mail app so you keep a copy of what you sent.</>
+                    )}
+                  </p>
+                </div>
               </form>
             </div>
 

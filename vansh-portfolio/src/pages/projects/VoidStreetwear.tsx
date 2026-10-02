@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
+import { useScrollFade } from '@/hooks/useScrollFade';
 import VoidStreetwearScene from '@/components/canvas/projects/VoidStreetwearScene';
 
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const VoidStreetwear = () => {
+  const scrollIndicatorRef = useScrollFade<HTMLDivElement>(200);
   const { setActiveAccent } = useThemeStore();
-  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -30,16 +31,6 @@ const VoidStreetwear = () => {
     };
   }, [setActiveAccent]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      const opacity = Math.max(0, 1 - scrolled / 200);
-      setScrollIndicatorOpacity(opacity);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -62,20 +53,23 @@ const VoidStreetwear = () => {
 
       {/* 3D Canvas */}
       <div className="fixed inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} intensity={1} />
+        <Canvas
+          shadows
+          camera={{ position: [0.9, 2.75, 10.4], fov: 44 }}
+          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          dpr={[1, 1.5]}
+        >
           <VoidStreetwearScene />
         </Canvas>
       </div>
 
       {/* Interaction Hint */}
       <div
+        ref={scrollIndicatorRef}
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
-        style={{ opacity: scrollIndicatorOpacity }}
       >
         <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-          Move Mouse to Interact
+          Move to Push · Drag to Grab
         </span>
         <div className="w-px h-8 bg-gradient-to-b from-accent-neon to-transparent" />
       </div>
@@ -83,13 +77,15 @@ const VoidStreetwear = () => {
       {/* Content Overlay */}
       <div className="relative z-10 pointer-events-none h-screen flex items-center">
         <div className="px-12 max-w-lg">
-          <span className="label-chip mb-4">Cloth Simulation + Vertex Shader</span>
+          <span className="label-chip mb-4">Verlet Cloth Solver</span>
           <h2 className="hero-text text-4xl md:text-5xl mb-6">
             Feel the<br />Movement
           </h2>
-          <p className="text-muted-foreground">
-            Physics-based cloth that responds to your every move.
-            Drag, pull, and watch fabric come alive.
+          <p className="text-muted-foreground leading-relaxed">
+            A mass-spring cloth solved on the CPU — structural, shear and bend constraints
+            relaxed with Verlet integration every frame, with normals recomputed so the
+            lighting catches each fold. Move the cursor to push the fabric; press and drag
+            to grab a point and pull it.
           </p>
         </div>
       </div>

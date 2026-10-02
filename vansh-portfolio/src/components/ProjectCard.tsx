@@ -124,7 +124,7 @@ const ProjectCard = ({
           <>
             <div className="absolute inset-0 opacity-50" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
             <div className="absolute left-8 top-12 h-28 w-28 rounded-full border border-purple-300/20" />
-            <div className="absolute right-8 bottom-10 h-24 w-44 rounded-xl border border-purple-300/20 bg-white/5 backdrop-blur-[1px]" />
+            <div className="absolute right-8 bottom-10 h-24 w-44 rounded-xl border border-purple-300/20 bg-white/5" />
           </>
         );
       case 'velocity-ev':

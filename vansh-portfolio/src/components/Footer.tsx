@@ -72,15 +72,20 @@ const Footer = () => {
             Navigation
           </h4>
           <ul className="space-y-2">
-            {['Work', 'About', 'Process', 'Contact'].map((item) => (
-              <li key={item}>
+            {[
+              { label: 'Work', href: '/#work' },
+              { label: 'About', href: '/about' },
+              { label: 'Process', href: '/process' },
+              { label: 'Contact', href: '/contact' },
+            ].map((item) => (
+              <li key={item.label}>
                 <a
-                  href="#"
+                  href={item.href}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onMouseEnter={() => setCursorVariant('hover')}
                   onMouseLeave={() => setCursorVariant('default')}
                 >
-                  {item}
+                  {item.label}
                 </a>
               </li>
             ))}
@@ -95,6 +100,7 @@ const Footer = () => {
             {[
               { name: 'LinkedIn', url: 'https://www.linkedin.com/in/vansh-kapoor-03a7572a7/' },
               { name: 'GitHub', url: 'https://github.com/Vansh-kap-98' },
+              { name: 'Resume (PDF)', url: '/Vansh_Kapoor_Resume.pdf' },
             ].map((item) => (
               <li key={item.name}>
                 <a
@@ -132,9 +138,9 @@ const Footer = () => {
             Location
           </h4>
           <p className="text-sm text-muted-foreground">
-            Remote-First Studio
+            Jaipur, Rajasthan, India
             <br />
-            Working Worldwide
+            Available remotely worldwide
           </p>
         </div>
       </div>

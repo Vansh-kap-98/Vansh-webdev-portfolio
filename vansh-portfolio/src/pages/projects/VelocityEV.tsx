@@ -27,7 +27,6 @@ const VelocityEV = () => {
   const [selectedModel, setSelectedModel] = useState(modelOptions[0]);
   const [cameraMode, setCameraMode] = useState<'exterior' | 'interior'>('exterior');
   const [isReserved, setIsReserved] = useState(false);
-  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -54,17 +53,6 @@ const VelocityEV = () => {
     };
   }, [setActiveAccent]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      const opacity = Math.max(0, 1 - scrolled / 200);
-      setScrollIndicatorOpacity(opacity);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
       {/* Back Button */}
@@ -86,7 +74,14 @@ const VelocityEV = () => {
 
       {/* 3D Canvas */}
       <div className="fixed inset-0 z-0 bg-[#050505]">
-        <Canvas camera={{ position: [8, 4, 8], fov: 45 }} shadows>
+        <Canvas
+          camera={{ position: [8, 4, 8], fov: 45 }}
+          shadows
+          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          // Uncapped, this rendered at full device pixel ratio — on a 2× display
+          // that is 4× the fragments, with shadows and a reflector on top.
+          dpr={[1, 1.5]}
+        >
           <VelocityEVScene
             color={selectedColor.hex}
             cameraMode={cameraMode}
@@ -96,7 +91,7 @@ const VelocityEV = () => {
       </div>
 
       {/* Model Selection (Top Center) */}
-      <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex gap-4 bg-background/40 backdrop-blur-md p-1 rounded-full border border-border/50 config-ui opacity-0">
+      <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex gap-4 bg-[#0a0a0a]/85 p-1 rounded-full border border-border/50 config-ui opacity-0">
         {modelOptions.map((model) => (
           <button
             key={model.id}

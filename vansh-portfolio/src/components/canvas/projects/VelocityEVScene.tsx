@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import {
   Environment,
-  ContactShadows,
+  Lightformer,
   MeshReflectorMaterial,
   Float,
   RoundedBox
@@ -120,7 +120,24 @@ const VelocityEVScene = ({ color, cameraMode, modelType }: VelocityEVSceneProps)
 
   return (
     <>
-      <Environment preset="city" />
+      {/*
+        A built-in `preset` would fetch an HDR from an external CDN at runtime —
+        if that request fails the car loses every reflection and the paint goes
+        flat. These lightformers are baked into the env map locally instead, and
+        give a studio rig with the long strip highlights car renders want.
+      */}
+      <Environment resolution={256} frames={1}>
+        <color attach="background" args={['#0a0a0c']} />
+        {/* Overhead softbox */}
+        <Lightformer intensity={1.6} rotation-x={Math.PI / 2} position={[0, 6, -2]} scale={[12, 12, 1]} />
+        {/* Strip highlights running down each flank */}
+        <Lightformer intensity={3.4} rotation-y={Math.PI / 2} position={[-6, 1.2, 0]} scale={[22, 0.6, 1]} />
+        <Lightformer intensity={2.2} rotation-y={Math.PI / 2} position={[-6, -0.6, 0]} scale={[22, 0.4, 1]} />
+        <Lightformer intensity={3.4} rotation-y={-Math.PI / 2} position={[6, 1.2, 0]} scale={[22, 0.8, 1]} />
+        {/* Cool kicker from behind, tinted with the selected paint */}
+        <Lightformer form="ring" color={color} intensity={2.4} scale={5} position={[-7, 5, -6]} />
+        <Lightformer form="ring" color="#b9d2ff" intensity={1.4} scale={4} position={[7, 3, -7]} />
+      </Environment>
 
       <spotLight
         position={[10, 15, 10]}
@@ -315,7 +332,7 @@ const VelocityEVScene = ({ color, cameraMode, modelType }: VelocityEVSceneProps)
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
         <planeGeometry args={[50, 50]} />
         <MeshReflectorMaterial
-          blur={[400, 100]}
+          blur={[180, 55]}
           resolution={256}
           mixBlur={1}
           mixStrength={40}

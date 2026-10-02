@@ -1,15 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
+import { useScrollFade } from '@/hooks/useScrollFade';
 import EstateScene from '@/components/canvas/projects/EstateScene';
 
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+const SECTIONS = [
+  {
+    eyebrow: 'Approach',
+    title: 'Aerial View',
+    copy: 'The tour opens above the property. Scroll position maps to a point on a Catmull-Rom spline, so the descent reads as one continuous take rather than a cut between fixed viewpoints.',
+  },
+  {
+    eyebrow: 'Threshold',
+    title: 'Front Door',
+    copy: 'A second spline drives the look-at target independently of the camera position. That separation is what lets the camera keep facing the facade while it drops, then pivot through the doorway.',
+  },
+  {
+    eyebrow: 'Interior',
+    title: 'Living Room',
+    copy: 'Inside, the camera turns toward the glazed wall. Warm interior point lights and emissive window panels carry the night-time read; a single tight-frustum directional light handles shadows.',
+  },
+] as const;
+
 const TheEstate = () => {
+  const scrollIndicatorRef = useScrollFade<HTMLDivElement>(200);
   const { setActiveAccent } = useThemeStore();
-  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
     // Kill all ScrollTriggers
@@ -35,17 +54,6 @@ const TheEstate = () => {
     };
   }, [setActiveAccent]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      // Fade out over first 200px of scroll
-      const opacity = Math.max(0, 1 - scrolled / 200);
-      setScrollIndicatorOpacity(opacity);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -69,17 +77,20 @@ const TheEstate = () => {
 
       {/* 3D Canvas - Fixed background */}
       <div className="fixed inset-0 z-0">
-        <Canvas camera={{ position: [0, 10, 20], fov: 60 }}>
-          <ambientLight intensity={0.3} />
-          <directionalLight position={[10, 10, 5]} intensity={1} />
+        <Canvas
+          shadows
+          camera={{ position: [0, 15, 22], fov: 55 }}
+          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          dpr={[1, 1.5]}
+        >
           <EstateScene />
         </Canvas>
       </div>
 
       {/* Scroll Indicator */}
       <div
+        ref={scrollIndicatorRef}
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
-        style={{ opacity: scrollIndicatorOpacity }}
       >
         <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
           Scroll to Explore
@@ -87,30 +98,33 @@ const TheEstate = () => {
         <div className="w-px h-8 bg-gradient-to-b from-accent-teal to-transparent" />
       </div>
 
-      {/* Content Overlay - This creates the scroll height */}
+      {/* Content Overlay — also sets the scroll height the camera rig reads */}
       <div className="relative z-10">
-        {/* Section 1: Aerial View */}
-        <div className="h-screen w-full flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <span className="label-chip mb-4 pointer-events-auto">ScrollControls + CatmullRomCurve3</span>
-            <h2 className="font-heading text-4xl md:text-6xl font-bold">Aerial View</h2>
+        {SECTIONS.map((section, index) => (
+          <div
+            key={section.title}
+            className={`h-screen w-full flex items-center pointer-events-none px-8 md:px-16 ${
+              index % 2 === 0 ? 'justify-start' : 'justify-end'
+            }`}
+          >
+            <div className={`max-w-md ${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
+              {index === 0 && (
+                <span className="label-chip mb-5 pointer-events-auto">
+                  Dual Spline Rig + CatmullRomCurve3
+                </span>
+              )}
+              <div className="font-mono text-[10px] text-accent-teal tracking-[0.3em] uppercase mb-3">
+                {String(index + 1).padStart(2, '0')} / {section.eyebrow}
+              </div>
+              <h2 className="font-heading text-4xl md:text-6xl font-bold tracking-tight mb-4">
+                {section.title}
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">{section.copy}</p>
+            </div>
           </div>
-        </div>
-
-        {/* Section 2: Front Door */}
-        <div className="h-screen w-full flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <h2 className="font-heading text-4xl md:text-6xl font-bold">Front Door</h2>
-          </div>
-        </div>
-
-        {/* Section 3: Living Room */}
-        <div className="h-screen w-full flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <h2 className="font-heading text-4xl md:text-6xl font-bold">Living Room</h2>
-          </div>
-        </div>
+        ))}
       </div>
+
     </div>
   );
 };

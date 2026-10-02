@@ -166,7 +166,8 @@
   .project-card-dimmed {
     opacity: 0.3;
     filter: grayscale(0.5);
-    transition: all var(--duration-normal) var(--ease-smooth);
+    transition: opacity var(--duration-normal) var(--ease-smooth),
+                filter var(--duration-normal) var(--ease-smooth);
   }
 
   /* Magnetic Button Base */
@@ -282,6 +283,12 @@
     background: hsl(var(--background) / 0.8);
     backdrop-filter: blur(20px);
   }
+}
+
+/* Indeterminate bar for the lazy-route fallback */
+@keyframes loading {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
 }
 
 @keyframes scroll-pulse {

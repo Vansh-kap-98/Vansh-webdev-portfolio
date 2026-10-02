@@ -38,9 +38,11 @@ const Artifacts = () => {
   const { setActiveAccent } = useThemeStore();
 
   // ── Scroll text fade ──────────────────────────────────────────────────────
-  const [heroOpacity, setHeroOpacity] = useState(1);
-  const [heroY, setHeroY] = useState(0);
-  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
+  // Driven by direct DOM writes. These used to be three pieces of React state
+  // updated from the scene's scroll event, so the page re-rendered ~20×/s and
+  // dragged the entire <Canvas> subtree through reconciliation with it.
+  const heroRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
   // ── Focus panel ───────────────────────────────────────────────────────────
   const [focusPainting, setFocusPainting] = useState<Painting | null>(null);
@@ -81,10 +83,15 @@ const Artifacts = () => {
 
   const handleScroll = useCallback((e: Event) => {
     const { offset } = (e as CustomEvent<{ offset: number }>).detail;
-    setScrollIndicatorOpacity(Math.max(0, 1 - offset / 0.08));
-    const p = Math.min(1, offset / 0.06);
-    setHeroOpacity(Math.max(0, 1 - p * p * p));
-    setHeroY(-(p * 32));
+
+    if (scrollIndicatorRef.current) {
+      scrollIndicatorRef.current.style.opacity = String(Math.max(0, 1 - offset / 0.08));
+    }
+    if (heroRef.current) {
+      const p = Math.min(1, offset / 0.06);
+      heroRef.current.style.opacity = String(Math.max(0, 1 - p * p * p));
+      heroRef.current.style.transform = `translateY(${-(p * 32)}px)`;
+    }
   }, []);
 
   const handleHover = useCallback((e: Event) => {
@@ -146,22 +153,24 @@ const Artifacts = () => {
 
       {/* Hero Text */}
       <div
+        ref={heroRef}
         className="fixed inset-0 z-10 flex items-center justify-center pointer-events-none"
-        style={{ opacity: heroOpacity, transform: `translateY(${heroY}px)`, willChange: 'opacity, transform' }}
+        style={{ willChange: 'opacity, transform' }}
       >
         <div className="text-center">
-          <span className="label-chip mb-4">Classical Gallery</span>
+          <span className="label-chip mb-4">ScrollControls + Emissive Proximity</span>
           <h2 className="hero-text text-4xl md:text-6xl mb-4">Enter the<br />Infinite</h2>
           <p className="text-muted-foreground max-w-md mx-auto text-sm">
-            History's greatest masterpieces — hover a painting to explore
+            Six public-domain masterpieces — hover a canvas to read its placard
           </p>
         </div>
       </div>
 
       {/* Scroll Indicator */}
       <div
+        ref={scrollIndicatorRef}
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"
-        style={{ opacity: scrollIndicatorOpacity, willChange: 'opacity' }}
+        style={{ willChange: 'opacity' }}
       >
         <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
           Scroll to Explore Gallery

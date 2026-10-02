@@ -1,15 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
+import { useScrollFade } from '@/hooks/useScrollFade';
 import NeuroCoreScene from '@/components/canvas/projects/NeuroCoreScene';
 
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+const FEATURES = [
+  {
+    eyebrow: 'Formation',
+    title: 'Data Cloud',
+    copy: '2,600 instances on a single draw call, distributed over a Fibonacci sphere. Each one carries its own approach speed, so the swarm arrives over a spread of frames instead of snapping into place together.',
+  },
+  {
+    eyebrow: 'Morph',
+    title: 'Security',
+    copy: "Targets aren't hand-written trig. The shield is rasterised from an SVG path to an offscreen canvas, and particles are assigned to its filled pixels — which is why the silhouette actually reads.",
+  },
+  {
+    eyebrow: 'Transition',
+    title: 'Speed',
+    copy: 'Scroll position maps onto a continuous blend across the four targets rather than switching at thresholds, so one formation flows into the next. Particles still in transit scale up, making the motion legible.',
+  },
+  {
+    eyebrow: 'Formation',
+    title: 'Global',
+    copy: 'The final target distributes particles along latitude and longitude rings, so the same instance buffer resolves into a wire globe without changing a single material.',
+  },
+] as const;
+
 const NeuroCore = () => {
+  const scrollIndicatorRef = useScrollFade<HTMLDivElement>(200);
   const { setActiveAccent } = useThemeStore();
-  const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
 
   useEffect(() => {
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -30,16 +54,6 @@ const NeuroCore = () => {
     };
   }, [setActiveAccent]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      const opacity = Math.max(0, 1 - scrolled / 200);
-      setScrollIndicatorOpacity(opacity);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background neurocore-section">
@@ -62,17 +76,19 @@ const NeuroCore = () => {
 
       {/* 3D Canvas */}
       <div className="fixed inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 15], fov: 60 }}>
-          <ambientLight intensity={0.3} />
-          <pointLight position={[10, 10, 10]} intensity={1} color="#a855f7" />
+        <Canvas
+          camera={{ position: [0, 0, 11.5], fov: 55 }}
+          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          dpr={[1, 1.5]}
+        >
           <NeuroCoreScene />
         </Canvas>
       </div>
 
       {/* Scroll Indicator */}
       <div
+        ref={scrollIndicatorRef}
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
-        style={{ opacity: scrollIndicatorOpacity }}
       >
         <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
           Scroll to Morph
@@ -80,42 +96,33 @@ const NeuroCore = () => {
         <div className="w-px h-8 bg-gradient-to-b from-accent-purple to-transparent" />
       </div>
 
-      {/* Feature Sections */}
+      {/* Feature Sections — scroll position drives the morph */}
       <div className="relative z-10 pointer-events-none">
-        <div className="h-screen flex items-center justify-start px-12">
-          <div className="max-w-md">
-            <span className="label-chip mb-4">InstancedMesh + Particle Morphing</span>
-            <h2 className="hero-text text-4xl md:text-5xl mb-4">Data Cloud</h2>
-            <p className="text-muted-foreground">
-              Visualize millions of data points in real-time
-            </p>
+        {FEATURES.map((feature, index) => (
+          <div
+            key={feature.title}
+            className={`h-screen flex items-center px-8 md:px-16 ${
+              index % 2 === 0 ? 'justify-start' : 'justify-end'
+            }`}
+          >
+            <div className={`max-w-md ${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
+              {index === 0 && (
+                <span className="label-chip mb-5 pointer-events-auto">
+                  InstancedMesh + Particle Morphing
+                </span>
+              )}
+              <div className="font-mono text-[10px] text-accent-purple tracking-[0.3em] uppercase mb-3">
+                {String(index + 1).padStart(2, '0')} / {feature.eyebrow}
+              </div>
+              <h2 className="hero-text font-heading font-bold text-4xl md:text-5xl mb-4">
+                {feature.title}
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">{feature.copy}</p>
+            </div>
           </div>
-        </div>
-        <div className="h-screen flex items-center justify-end px-12">
-          <div className="max-w-md text-right">
-            <h2 className="hero-text text-4xl md:text-5xl mb-4">Security</h2>
-            <p className="text-muted-foreground">
-              Enterprise-grade protection for your data
-            </p>
-          </div>
-        </div>
-        <div className="h-screen flex items-center justify-start px-12">
-          <div className="max-w-md">
-            <h2 className="hero-text text-4xl md:text-5xl mb-4">Speed</h2>
-            <p className="text-muted-foreground">
-              Lightning-fast processing at any scale
-            </p>
-          </div>
-        </div>
-        <div className="h-screen flex items-center justify-end px-12">
-          <div className="max-w-md text-right">
-            <h2 className="hero-text text-4xl md:text-5xl mb-4">Global</h2>
-            <p className="text-muted-foreground">
-              Deploy across all regions instantly
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
+
     </div>
   );
 };

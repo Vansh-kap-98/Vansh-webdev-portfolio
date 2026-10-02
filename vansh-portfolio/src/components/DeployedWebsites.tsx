@@ -26,7 +26,7 @@ const deployedSites: DeployedSite[] = [
   {
     id: 'iccaiml',
     name: "ICCAIML'26",
-    url: 'https://www.iccaiml.com',
+    url: 'https://iccaiml-26-main.vercel.app',
     description:
       'Conference website for the 2nd International Conference on Computation of Artificial Intelligence and Machine Learning.',
     technicalDetails: [

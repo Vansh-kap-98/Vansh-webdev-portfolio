@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useContentStore } from '@/stores/contentStore';
@@ -9,7 +9,7 @@ const Hero = () => {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subtextRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
-  const [whatsappOpacity, setWhatsappOpacity] = useState(0);
+  const whatsappRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -60,7 +60,9 @@ const Hero = () => {
         {},
         {
           duration: 0.01,
-          onComplete: () => setWhatsappOpacity(1),
+          onComplete: () => {
+            if (whatsappRef.current) whatsappRef.current.style.opacity = '1';
+          },
         },
         '-=0.3'
       );
@@ -69,23 +71,34 @@ const Hero = () => {
     return () => ctx.revert();
   }, []);
 
-  // Fade WhatsApp button on scroll
+  // Fade the WhatsApp button on scroll.
+  // Written straight to the DOM and coalesced into a rAF: holding this in state
+  // re-rendered the whole hero on every scroll event.
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
+    let frame = 0;
+
+    const apply = () => {
+      frame = 0;
+      const el = whatsappRef.current;
+      if (!el) return;
       const fadeStart = 100;
       const fadeEnd = 400;
-      if (scrollY <= fadeStart) {
-        setWhatsappOpacity(1);
-      } else if (scrollY >= fadeEnd) {
-        setWhatsappOpacity(0);
-      } else {
-        setWhatsappOpacity(1 - (scrollY - fadeStart) / (fadeEnd - fadeStart));
-      }
+      const scrollY = window.scrollY;
+      const opacity =
+        scrollY <= fadeStart ? 1 : scrollY >= fadeEnd ? 0 : 1 - (scrollY - fadeStart) / (fadeEnd - fadeStart);
+      el.style.opacity = String(opacity);
+      el.style.pointerEvents = opacity > 0.1 ? 'auto' : 'none';
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(apply);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   return (
@@ -149,17 +162,14 @@ const Hero = () => {
 
       {/* WhatsApp CTA Button */}
       <a
+        ref={whatsappRef}
         href="https://wa.me/919818535499?text=Hi%20Vansh!%20I%20visited%20your%20portfolio%20and%20would%20love%20to%20connect."
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-8 right-8 z-50 group"
-        style={{
-          opacity: whatsappOpacity,
-          pointerEvents: whatsappOpacity > 0.1 ? 'auto' : 'none',
-          transition: 'opacity 0.3s ease',
-        }}
+        style={{ opacity: 0, pointerEvents: 'none', transition: 'opacity 0.3s ease' }}
       >
-        <div className="relative flex items-center gap-3 px-5 py-3 rounded-full border border-[#25D366]/30 bg-background/80 backdrop-blur-md hover:border-[#25D366]/70 hover:bg-[#25D366]/10 transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(37,211,102,0.15)]">
+        <div className="relative flex items-center gap-3 px-5 py-3 rounded-full border border-[#25D366]/30 bg-[#0a0a0a]/92 hover:border-[#25D366]/70 hover:bg-[#25D366]/10 transition-colors duration-300 group-hover:shadow-[0_0_25px_rgba(37,211,102,0.15)]">
           {/* Pulse ring */}
           <span
             className="absolute inset-0 rounded-full animate-ping bg-[#25D366]/10 pointer-events-none"

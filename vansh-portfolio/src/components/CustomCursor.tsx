@@ -33,38 +33,56 @@ const CustomCursor = () => {
     const mouse = { x: pos.x, y: pos.y };
     const speed = 0.2;
 
+    // `shown` mirrors the visibility state in a ref. The effect has an empty
+    // dependency list, so the `isVisible` it closed over is permanently false —
+    // the old guard therefore dispatched a setState on *every* mousemove.
+    let shown = false;
+    const reveal = () => {
+      if (shown) return;
+      shown = true;
+      setIsVisible(true);
+    };
+    const hide = () => {
+      shown = false;
+      setIsVisible(false);
+    };
+
     const updatePosition = (e: MouseEvent) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
-      if (!isVisible) setIsVisible(true);
+      reveal();
     };
 
+    // The loop re-schedules itself, so the id has to be tracked each frame;
+    // previously cleanup only ever cancelled the very first frame and the
+    // loop went on running after unmount.
+    let frameId = 0;
     const animate = () => {
       pos.x += (mouse.x - pos.x) * speed;
       pos.y += (mouse.y - pos.y) * speed;
 
-      // Update dot directly to mouse position
+      // Dot tracks the pointer exactly; ring lags behind it.
       xSetDot(mouse.x);
       ySetDot(mouse.y);
-
-      // Update ring with smoothed position
       xSetRing(pos.x);
       ySetRing(pos.y);
 
-      requestAnimationFrame(animate);
+      frameId = requestAnimationFrame(animate);
     };
 
-    window.addEventListener('mousemove', updatePosition);
-    window.addEventListener('mouseenter', () => setIsVisible(true));
-    window.addEventListener('mouseleave', () => setIsVisible(false));
+    window.addEventListener('mousemove', updatePosition, { passive: true });
+    window.addEventListener('mouseenter', reveal);
+    window.addEventListener('mouseleave', hide);
 
-    const ticker = requestAnimationFrame(animate);
+    frameId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', updatePosition);
-      cancelAnimationFrame(ticker);
+      window.removeEventListener('mouseenter', reveal);
+      window.removeEventListener('mouseleave', hide);
+      cancelAnimationFrame(frameId);
     };
-  }, []); // Remove isVisible dependency to prevent effect re-runs
+  }, []);
 
   useEffect(() => {
     const ring = cursorRingRef.current;
