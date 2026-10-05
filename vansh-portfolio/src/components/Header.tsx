@@ -186,7 +186,7 @@ const Header = () => {
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen((open) => !open)}
-            className="md:hidden flex flex-col justify-center gap-1.5 w-8 h-8 items-end"
+            className="md:hidden flex flex-col justify-center gap-1.5 w-11 h-11 items-end -mr-2"
           >
             <span
               className={`h-px transition-all duration-300 ${isScrolled ? 'bg-black' : 'bg-foreground'} ${
@@ -213,7 +213,7 @@ const Header = () => {
                 key={link.label}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`font-mono text-[13px] tracking-widest uppercase py-3 border-b transition-colors ${
+                className={`font-mono text-[13px] tracking-widest uppercase py-4 min-h-[48px] flex items-center border-b transition-colors ${
                   isScrolled
                     ? 'text-black/70 hover:text-black border-black/10'
                     : 'text-foreground/80 hover:text-foreground border-foreground/10'
@@ -226,7 +226,7 @@ const Header = () => {
               href="/Vansh_Kapoor_Resume.pdf"
               download="Vansh_Kapoor_Resume.pdf"
               onClick={() => setIsMenuOpen(false)}
-              className={`font-mono text-[13px] tracking-widest uppercase py-3 transition-colors ${
+              className={`font-mono text-[13px] tracking-widest uppercase py-4 min-h-[48px] flex items-center transition-colors ${
                 isScrolled ? 'text-black/70 hover:text-black' : 'text-foreground/80 hover:text-foreground'
               }`}
             >

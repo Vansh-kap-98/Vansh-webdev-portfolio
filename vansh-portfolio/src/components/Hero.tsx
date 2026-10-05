@@ -2,8 +2,10 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useContentStore } from '@/stores/contentStore';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 const Hero = () => {
+  const { lite } = useDeviceProfile();
   const { heroHeading, heroSubtext, heroCornerLabel, heroCornerSublabel } = useContentStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -12,6 +14,20 @@ const Hero = () => {
   const whatsappRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
+    // The hero markup starts at opacity-0 and is revealed by this timeline. That
+    // is fine on desktop, but it makes the single most important element on the
+    // site contingent on an animation completing. On mobile and under reduced
+    // motion, show it immediately instead.
+    if (lite) {
+      gsap.set(containerRef.current, { opacity: 1 });
+      if (headingRef.current) {
+        gsap.set(headingRef.current.querySelectorAll('.word'), { y: 0, opacity: 1 });
+      }
+      gsap.set([subtextRef.current, scrollIndicatorRef.current], { y: 0, opacity: 1 });
+      if (whatsappRef.current) whatsappRef.current.style.opacity = '1';
+      return;
+    }
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ delay: 0.5 });
 
@@ -69,7 +85,7 @@ const Hero = () => {
     });
 
     return () => ctx.revert();
-  }, []);
+  }, [lite]);
 
   // Fade the WhatsApp button on scroll.
   // Written straight to the DOM and coalesced into a rAF: holding this in state

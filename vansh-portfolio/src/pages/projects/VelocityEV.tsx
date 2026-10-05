@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
+import ProjectTopBar from '@/components/ProjectTopBar';
 import { useThemeStore } from '@/stores/themeStore';
 import VelocityEVScene from '@/components/canvas/projects/VelocityEVScene';
 import { useDeviceProfile } from '@/hooks/useDeviceProfile';
@@ -44,35 +43,28 @@ const VelocityEV = () => {
 
     setActiveAccent('gold');
 
-    // UI Entrance Animation
-    gsap.fromTo('.config-ui',
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: 'power3.out', delay: 0.5 }
-    );
+    // UI entrance. The staggered version takes ~2.5s to finish, which is a long
+    // time to stare at a car you cannot configure on a phone — and under
+    // reduced-motion it shouldn't play at all. Both cases get the controls
+    // immediately instead.
+    if (lite) {
+      gsap.set('.config-ui', { opacity: 1, y: 0 });
+    } else {
+      gsap.fromTo(
+        '.config-ui',
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: 'power3.out', delay: 0.5 }
+      );
+    }
 
     return () => {
       setActiveAccent(null);
     };
-  }, [setActiveAccent]);
+  }, [setActiveAccent, lite]);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Back Button */}
-      <Link
-        to="/"
-        className="fixed top-8 left-8 z-50 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="font-mono text-sm">Back</span>
-      </Link>
-
-      {/* Project Header */}
-      <div className="fixed top-8 right-8 z-50 text-right">
-        <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest block opacity-60">
-          Automotive
-        </span>
-        <h1 className="font-heading text-2xl font-bold tracking-tighter">Velocity EV</h1>
-      </div>
+      <ProjectTopBar category="Automotive" title="Velocity EV" />
 
       {/* 3D Canvas */}
       <div className="fixed inset-0 z-0 bg-[#050505]">

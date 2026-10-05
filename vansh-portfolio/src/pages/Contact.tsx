@@ -70,7 +70,7 @@ const Contact = () => {
           {/* Back Button */}
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground hover:text-foreground transition-colors mb-12"
+            className="inline-flex items-center gap-2 font-mono text-[11px] text-muted-foreground hover:text-foreground transition-colors mb-12 min-h-[44px] -ml-2 px-2 rounded-full active:bg-foreground/10 md:min-h-0 md:ml-0 md:px-0"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Home
@@ -198,7 +198,7 @@ const Contact = () => {
                       </h3>
                       <a
                         href={`mailto:${contactEmail}`}
-                        className="text-foreground hover:text-accent-teal transition-colors"
+                        className="inline-block py-3 text-foreground hover:text-accent-teal transition-colors"
                       >
                         {contactEmail}
                       </a>

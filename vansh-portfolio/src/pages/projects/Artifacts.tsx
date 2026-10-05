@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, X, Maximize2 } from 'lucide-react';
+import { X, Maximize2 } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
+import ProjectTopBar from '@/components/ProjectTopBar';
 import { useThemeStore } from '@/stores/themeStore';
 import ArtifactsScene, { type Painting } from '@/components/canvas/projects/ArtifactsScene';
 import { useDeviceProfile } from '@/hooks/useDeviceProfile';
@@ -138,17 +138,7 @@ const Artifacts = () => {
     <div className="min-h-screen bg-background">
       <style>{FOCUS_STYLES}</style>
 
-      {/* Back */}
-      <Link to="/" className="fixed top-8 left-8 z-50 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-5 h-5" />
-        <span className="font-mono text-sm">Back</span>
-      </Link>
-
-      {/* Header */}
-      <div className="fixed top-8 right-8 z-50 text-right">
-        <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest block">Museum</span>
-        <h1 className="font-heading text-2xl font-bold">Artifacts</h1>
-      </div>
+      <ProjectTopBar category="Museum" title="Artifacts" />
 
       {/* 3D Canvas */}
       <div className="fixed inset-0 z-0">
@@ -179,11 +169,12 @@ const Artifacts = () => {
       {/* Scroll Indicator */}
       <div
         ref={scrollIndicatorRef}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"
+        className="safe-bottom fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"
         style={{ willChange: 'opacity' }}
       >
         <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-          Scroll to Explore Gallery
+          <span className="md:hidden">Scroll to explore</span>
+          <span className="hidden md:inline">Scroll to Explore Gallery</span>
         </span>
         <div className="w-px h-8 bg-gradient-to-b from-accent-cyan to-transparent" />
       </div>
@@ -407,8 +398,8 @@ const Artifacts = () => {
         </div>
       )}
 
-      {/* Artwork Counter */}
-      <div className="fixed bottom-8 right-8 z-50 text-right">
+      {/* Artwork Counter — decorative, and it collides with the scroll hint on a phone */}
+      <div className="hidden md:block fixed bottom-8 right-8 z-50 text-right">
         <span className="font-mono text-[10px] text-muted-foreground block">ARTWORKS</span>
         <span className="font-heading text-xl font-bold">06</span>
       </div>

@@ -373,3 +373,118 @@
 .cms-portal .custom-cursor {
   display: none !important;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Mobile legibility pass
+
+   An audit at 375px found 103 text nodes below 13px on the homepage alone —
+   19 of them at 8px — and 11 tap targets under the 44px minimum. The design
+   leans on tiny wide-tracked mono labels, which works at desktop viewing
+   distance and falls apart in the hand.
+
+   These rules raise the floor rather than rewriting ~100 call sites, so the
+   desktop composition is untouched. Letter-spacing comes down with the size
+   increase: wide tracking is what makes small type hardest to read.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Never auto-inflate text when rotating to landscape. */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* 300 weight is too light to hold up at phone sizes and brightness. */
+  body {
+    font-weight: 400;
+  }
+
+  /* Visible feedback on tap, instead of the default blue flash. */
+  a,
+  button,
+  [role='button'] {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* ── Type floor ── */
+  .text-\[8px\],
+  .text-\[9px\] {
+    font-size: 12px !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .text-\[10px\],
+  .text-\[11px\] {
+    font-size: 12px !important;
+  }
+
+  .mono,
+  .text-xs {
+    font-size: 13px !important;
+  }
+
+  .label-chip {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.7rem;
+  }
+
+  /* Body copy: 14px is the floor for anything you actually read. */
+  .text-sm {
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Wide tracking costs more legibility than it buys at these sizes. */
+  .tracking-\[0\.3em\],
+  .tracking-\[0\.35em\],
+  .tracking-\[0\.25em\],
+  .tracking-\[0\.2em\],
+  .tracking-widest {
+    letter-spacing: 0.1em !important;
+  }
+
+  /* Form controls must be >= 16px or iOS Safari zooms the whole viewport when
+     they take focus, leaving the user to pinch back out. The `:not([hidden])`
+     is there purely for specificity: it outranks the `.text-sm` override above,
+     which would otherwise hold the textarea at 15px. */
+  input:not([hidden]),
+  textarea:not([hidden]),
+  select:not([hidden]) {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+
+  input:not([type='checkbox']):not([type='radio']),
+  select:not([hidden]) {
+    min-height: 44px;
+  }
+
+  /* ── Touch targets ──
+     Padding alone would reflow the layout, so grow the hit area with a
+     pseudo-element that extends past the visual bounds. */
+  .touch-target {
+    position: relative;
+  }
+
+  .touch-target::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+  }
+
+  /* Header wordmark and the big mailto both fell just short of 44px. */
+  header > nav > a:first-child {
+    padding-block: 0.4rem;
+  }
+}
+
+/* Keep fixed bottom UI clear of the home indicator on notched phones. */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

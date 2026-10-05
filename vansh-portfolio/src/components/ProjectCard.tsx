@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project } from './WorkGrid';
 import { useThemeStore, accentColors } from '@/stores/themeStore';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 import { ArrowUpRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -28,6 +29,7 @@ const ProjectCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { lite } = useDeviceProfile();
   const { setCursorVariant, setCursorText } = useThemeStore();
 
   const isLarge = index % 3 === 0;
@@ -46,6 +48,15 @@ const ProjectCard = ({
     const card = cardRef.current;
     if (!card) return;
 
+    // On mobile and under reduced motion the card is simply visible. The reveal
+    // left it at opacity 0 until a ScrollTrigger fired, so any hiccup in that
+    // chain meant a blank grid — a bad trade for a fade, and it also keeps six
+    // triggers out of the scroll path on the device that can least afford them.
+    if (lite) {
+      gsap.set(card, { opacity: 1, y: 0 });
+      return;
+    }
+
     gsap.fromTo(
       card,
       { y: 60, opacity: 0 },
@@ -63,7 +74,7 @@ const ProjectCard = ({
         },
       }
     );
-  }, []);
+  }, [lite]);
 
   const handleMouseEnter = () => {
     onMouseEnter();

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
+import ProjectTopBar from '@/components/ProjectTopBar';
 import { useThemeStore } from '@/stores/themeStore';
 import { useScrollFade } from '@/hooks/useScrollFade';
 import GastroLabScene from '@/components/canvas/projects/GastroLabScene';
@@ -56,22 +55,7 @@ const GastroLab = () => {
 
   return (
     <div className="min-h-screen bg-background gastro-section">
-      {/* Back Button */}
-      <Link
-        to="/"
-        className="fixed top-8 left-8 z-50 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="font-mono text-sm">Back</span>
-      </Link>
-
-      {/* Project Header */}
-      <div className="fixed top-8 right-8 z-50 text-right">
-        <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest block">
-          Restaurant
-        </span>
-        <h1 className="font-heading text-2xl font-bold">Gastro Lab</h1>
-      </div>
+      <ProjectTopBar category="Restaurant" title="Gastro Lab" />
 
       {/* 3D Canvas */}
       <div className="fixed inset-0 z-0">
@@ -88,7 +72,7 @@ const GastroLab = () => {
       {/* Scroll Indicator */}
       <div
         ref={scrollIndicatorRef}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
+        className="safe-bottom fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 transition-opacity duration-300"
       >
         <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
           Scroll to Explode

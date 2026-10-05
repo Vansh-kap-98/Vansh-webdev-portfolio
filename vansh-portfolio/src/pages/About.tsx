@@ -38,7 +38,7 @@ const About = () => {
           {/* Back Button */}
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground hover:text-foreground transition-colors mb-12"
+            className="inline-flex items-center gap-2 font-mono text-[11px] text-muted-foreground hover:text-foreground transition-colors mb-12 min-h-[44px] -ml-2 px-2 rounded-full active:bg-foreground/10 md:min-h-0 md:ml-0 md:px-0"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Home
@@ -110,7 +110,7 @@ const About = () => {
                   <a
                     href="/Vansh_Kapoor_Resume.pdf"
                     download="Vansh_Kapoor_Resume.pdf"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background hover:bg-foreground/90 transition-colors font-mono text-[11px] tracking-widest uppercase"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] bg-foreground text-background hover:bg-foreground/90 transition-colors font-mono text-[11px] tracking-widest uppercase"
                   >
                     <Download className="w-4 h-4" />
                     Download PDF
@@ -119,7 +119,7 @@ const About = () => {
                     href="/Vansh_Kapoor_Resume.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 border border-border hover:border-foreground/50 transition-colors font-mono text-[11px] tracking-widest uppercase text-muted-foreground hover:text-foreground"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] border border-border hover:border-foreground/50 transition-colors font-mono text-[11px] tracking-widest uppercase text-muted-foreground hover:text-foreground"
                   >
                     <ExternalLink className="w-4 h-4" />
                     View in Browser

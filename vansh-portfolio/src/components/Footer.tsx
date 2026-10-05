@@ -3,13 +3,20 @@ import gsap from 'gsap';
 import { ArrowUpRight } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
 import { useContentStore } from '@/stores/contentStore';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 const Footer = () => {
+  const { lite } = useDeviceProfile();
   const { footerHeading, footerEmail, footerCopyright, footerTagline } = useContentStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const { setCursorVariant } = useThemeStore();
 
   useEffect(() => {
+    if (lite) {
+      gsap.set(containerRef.current, { opacity: 1, y: 0 });
+      return;
+    }
+
     const ctx = gsap.context(() => {
       gsap.fromTo(
         containerRef.current,
@@ -29,7 +36,7 @@ const Footer = () => {
     });
 
     return () => ctx.revert();
-  }, []);
+  }, [lite]);
 
   return (
     <footer ref={containerRef} className="relative py-section px-6 md:px-12 lg:px-20 border-t border-border">
@@ -41,7 +48,7 @@ const Footer = () => {
         </h2>
         <a
           href={`mailto:${footerEmail}`}
-          className="inline-flex items-center gap-4 group"
+          className="inline-flex items-center gap-4 group py-1"
           onMouseEnter={() => setCursorVariant('hover')}
           onMouseLeave={() => setCursorVariant('default')}
         >
@@ -82,7 +89,7 @@ const Footer = () => {
               <li key={item.label}>
                 <a
                   href={item.href}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="inline-block py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onMouseEnter={() => setCursorVariant('hover')}
                   onMouseLeave={() => setCursorVariant('default')}
                 >
@@ -108,7 +115,7 @@ const Footer = () => {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="inline-block py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onMouseEnter={() => setCursorVariant('hover')}
                   onMouseLeave={() => setCursorVariant('default')}
                 >

@@ -17,17 +17,9 @@ const About = () => {
       if (!textRef.current) return;
 
       if (lite) {
-        // One fade on the whole block instead of a scrubbed per-word stagger.
-        gsap.fromTo(
-          textRef.current,
-          { opacity: 0.35 },
-          {
-            opacity: 1,
-            duration: 0.6,
-            ease: 'power2.out',
-            scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
-          }
-        );
+        // No scrubbed per-word stagger, and no faded start state either: the
+        // copy is simply legible on arrival.
+        gsap.set(textRef.current.querySelectorAll('.word'), { opacity: 1 });
         return;
       }
 
