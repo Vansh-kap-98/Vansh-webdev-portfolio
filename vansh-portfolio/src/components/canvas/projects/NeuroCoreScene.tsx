@@ -1,5 +1,6 @@
 import { useRef, useMemo, useEffect, useLayoutEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 import * as THREE from 'three';
 
 /**
@@ -13,6 +14,9 @@ import * as THREE from 'three';
  */
 
 const COUNT = 2600;
+/** Phones get a thinner swarm: the silhouettes still read, at under half the
+ *  per-frame matrix writes and fragment load. */
+const COUNT_LITE = 1100;
 
 // ─── Target builders ─────────────────────────────────────────────────────────
 
@@ -148,27 +152,29 @@ const NeuroCoreScene = () => {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const coreRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
+  const { lite } = useDeviceProfile();
+  const count = lite ? COUNT_LITE : COUNT;
 
   const targetProgress = useRef(0);
   const progress = useRef(0);
 
   const shapes = useMemo(
     () => [
-      dataCloud(COUNT, 3.6),
-      sampleSilhouette(SHIELD_PATH, COUNT, 7.4),
-      sampleSilhouette(BOLT_PATH, COUNT, 8.0),
-      wireGlobe(COUNT, 2.75),
+      dataCloud(count, 3.6),
+      sampleSilhouette(SHIELD_PATH, count, 7.4),
+      sampleSilhouette(BOLT_PATH, count, 8.0),
+      wireGlobe(count, 2.75),
     ],
-    [],
+    [count],
   );
 
   // Per-particle state: current position, a speed jitter so the swarm doesn't
   // arrive in lockstep, and a fixed colour ramp position.
   const particles = useMemo(() => {
-    const current = new Float32Array(COUNT * 3);
-    const speed = new Float32Array(COUNT);
-    const phase = new Float32Array(COUNT);
-    for (let i = 0; i < COUNT; i++) {
+    const current = new Float32Array(count * 3);
+    const speed = new Float32Array(count);
+    const phase = new Float32Array(count);
+    for (let i = 0; i < count; i++) {
       current[i * 3] = (Math.random() - 0.5) * 14;
       current[i * 3 + 1] = (Math.random() - 0.5) * 14;
       current[i * 3 + 2] = (Math.random() - 0.5) * 14;
@@ -176,7 +182,7 @@ const NeuroCoreScene = () => {
       phase[i] = Math.random() * Math.PI * 2;
     }
     return { current, speed, phase };
-  }, []);
+  }, [count]);
 
   const colorA = useMemo(() => new THREE.Color('#a855f7'), []);
   const colorB = useMemo(() => new THREE.Color('#22d3ee'), []);
@@ -193,23 +199,23 @@ const NeuroCoreScene = () => {
     if (!mesh) return;
     const m = mesh.instanceMatrix.array as Float32Array;
     m.fill(0);
-    for (let i = 0; i < COUNT; i++) {
+    for (let i = 0; i < count; i++) {
       const o = i * 16;
       m[o] = m[o + 5] = m[o + 10] = m[o + 15] = 1;
     }
     mesh.instanceMatrix.needsUpdate = true;
-  }, []);
+  }, [count]);
 
   // Colour ramp is static, so write it once.
   useEffect(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
-    for (let i = 0; i < COUNT; i++) {
-      tmpColor.copy(colorA).lerp(colorB, (i / COUNT) * 0.85 + Math.random() * 0.15);
+    for (let i = 0; i < count; i++) {
+      tmpColor.copy(colorA).lerp(colorB, (i / count) * 0.85 + Math.random() * 0.15);
       mesh.setColorAt(i, tmpColor);
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [colorA, colorB, tmpColor]);
+  }, [colorA, colorB, tmpColor, count]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -246,7 +252,7 @@ const NeuroCoreScene = () => {
     const { current, speed, phase } = particles;
     const m = mesh.instanceMatrix.array as Float32Array;
 
-    for (let i = 0; i < COUNT; i++) {
+    for (let i = 0; i < count; i++) {
       const a = from[i];
       const b = to[i];
       const tx = a.x + (b.x - a.x) * blend;
@@ -302,7 +308,7 @@ const NeuroCoreScene = () => {
       <pointLight position={[8, 8, 8]} intensity={60} distance={40} decay={2} color="#a855f7" />
       <pointLight position={[-8, -4, 6]} intensity={40} distance={40} decay={2} color="#22d3ee" />
 
-      <instancedMesh ref={meshRef} args={[undefined, undefined, COUNT]} frustumCulled={false}>
+      <instancedMesh ref={meshRef} args={[undefined, undefined, count]} frustumCulled={false}>
         <sphereGeometry args={[0.028, 6, 5]} />
         <meshBasicMaterial toneMapped={false} />
       </instancedMesh>

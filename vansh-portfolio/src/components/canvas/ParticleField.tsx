@@ -9,11 +9,13 @@ const ParticleField = () => {
 
   const count = 1200;
 
-  const [positions, velocities, alphas, alphaVelocities] = useMemo(() => {
+  const [positions, velocities, fadeSpeeds, fadePhases] = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const velocities = new Float32Array(count * 3);
-    const alphas = new Float32Array(count);
-    const alphaVelocities = new Float32Array(count);
+    // Static per-particle fade parameters — the wave itself is evaluated in the
+    // vertex shader, so neither of these is ever re-uploaded.
+    const fadeSpeeds = new Float32Array(count);
+    const fadePhases = new Float32Array(count);
 
     for (let i = 0; i < count; i++) {
       // Spread particles more evenly with higher variance
@@ -28,25 +30,28 @@ const ParticleField = () => {
       velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
       velocities[i * 3 + 2] = 0;
 
-      // Random initial opacity and fade speed for each particle
-      alphas[i] = Math.random();
-      alphaVelocities[i] = (Math.random() - 0.5) * 0.02;
+      fadeSpeeds[i] = 0.08 + Math.random() * 0.22;
+      fadePhases[i] = Math.random();
     }
 
-    return [positions, velocities, alphas, alphaVelocities];
+    return [positions, velocities, fadeSpeeds, fadePhases];
   }, [count]);
 
-  useFrame(({ mouse }) => {
+  useFrame(({ mouse, clock }) => {
     if (!meshRef.current) return;
+
+    shaderMaterial.uniforms.uTime.value = clock.getElapsedTime();
 
     const geometry = meshRef.current.geometry;
     const positionAttr = geometry.attributes.position;
-    const alphaAttr = geometry.attributes.alpha;
     const pos = positionAttr.array as Float32Array;
-    const alpha = alphaAttr.array as Float32Array;
 
     mouseRef.current.x = mouse.x * viewport.width * 0.5;
     mouseRef.current.y = mouse.y * viewport.height * 0.5;
+
+    // Compare squared distances; the only use was a radius test.
+    const RADIUS = 3;
+    const RADIUS_SQ = RADIUS * RADIUS;
 
     for (let i = 0; i < count; i++) {
       const ix = i * 3;
@@ -60,10 +65,10 @@ const ParticleField = () => {
       // Mouse influence
       const dx = mouseRef.current.x - pos[ix];
       const dy = mouseRef.current.y - pos[iy];
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      
-      if (dist < 3) {
-        const force = (3 - dist) * 0.002;
+      const distSq = dx * dx + dy * dy;
+
+      if (distSq < RADIUS_SQ) {
+        const force = (RADIUS - Math.sqrt(distSq)) * 0.002;
         pos[ix] += dx * force;
         pos[iy] += dy * force;
       }
@@ -74,23 +79,9 @@ const ParticleField = () => {
       if (pos[iy] > 25) pos[iy] = -25;
       if (pos[iy] < -25) pos[iy] = 25;
 
-      // Update alpha (fade in/out effect)
-      alphas[i] += alphaVelocities[i];
-      
-      // Reverse fade direction at bounds
-      if (alphas[i] > 1) {
-        alphas[i] = 1;
-        alphaVelocities[i] = -Math.abs(alphaVelocities[i]);
-      } else if (alphas[i] < 0.1) {
-        alphas[i] = 0.1;
-        alphaVelocities[i] = Math.abs(alphaVelocities[i]);
-      }
-      
-      alpha[i] = alphas[i];
     }
 
     positionAttr.needsUpdate = true;
-    alphaAttr.needsUpdate = true;
   });
 
   // Custom shader material for per-particle opacity
@@ -100,14 +91,20 @@ const ParticleField = () => {
         uniforms: {
           color: { value: new THREE.Color(0xffffff) },
           pointSize: { value: 0.05 },
+          uTime: { value: 0 },
         },
         vertexShader: `
-          attribute float alpha;
+          attribute float aFadeSpeed;
+          attribute float aFadePhase;
           varying float vAlpha;
           uniform float pointSize;
-          
+          uniform float uTime;
+
           void main() {
-            vAlpha = alpha;
+            // Triangle wave between 0.1 and 1.0 — the same ping-pong fade the
+            // CPU used to compute and upload for every particle, every frame.
+            float t = fract(uTime * aFadeSpeed + aFadePhase);
+            vAlpha = 0.1 + 0.9 * abs(t * 2.0 - 1.0);
             vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
             gl_PointSize = pointSize * (300.0 / -mvPosition.z);
             gl_Position = projectionMatrix * mvPosition;
@@ -142,13 +139,8 @@ const ParticleField = () => {
           itemSize={3}
           usage={THREE.DynamicDrawUsage}
         />
-        <bufferAttribute
-          attach="attributes-alpha"
-          count={count}
-          array={alphas}
-          itemSize={1}
-          usage={THREE.DynamicDrawUsage}
-        />
+        <bufferAttribute attach="attributes-aFadeSpeed" count={count} array={fadeSpeeds} itemSize={1} />
+        <bufferAttribute attach="attributes-aFadePhase" count={count} array={fadePhases} itemSize={1} />
       </bufferGeometry>
     </points>
   );

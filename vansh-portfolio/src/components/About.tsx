@@ -2,38 +2,54 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useContentStore } from '@/stores/contentStore';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const About = () => {
+  const { lite } = useDeviceProfile();
   const { aboutLabel, aboutText } = useContentStore();
   const sectionRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Animate the large text on scroll
-      if (textRef.current) {
-        const words = textRef.current.querySelectorAll('.word');
+      if (!textRef.current) return;
+
+      if (lite) {
+        // One fade on the whole block instead of a scrubbed per-word stagger.
         gsap.fromTo(
-          words,
-          { opacity: 0.2 },
+          textRef.current,
+          { opacity: 0.35 },
           {
             opacity: 1,
-            stagger: 0.1,
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top center',
-              end: 'bottom center',
-              scrub: true,
-            },
+            duration: 0.6,
+            ease: 'power2.out',
+            scrollTrigger: { trigger: sectionRef.current, start: 'top 80%', once: true },
           }
         );
+        return;
       }
+
+      const words = textRef.current.querySelectorAll('.word');
+      gsap.fromTo(
+        words,
+        { opacity: 0.2 },
+        {
+          opacity: 1,
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top center',
+            end: 'bottom center',
+            scrub: true,
+          },
+        }
+      );
     });
 
     return () => ctx.revert();
-  }, []);
+  }, [lite]);
 
   return (
     <section

@@ -1,7 +1,7 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import ReflectiveFloor from '@/components/canvas/ReflectiveFloor';
 
 /**
  * Scroll-linked exploded view.
@@ -413,22 +413,14 @@ const GastroLabScene = () => {
       </points>
 
       {/* Dark polished pass */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
-        <planeGeometry args={[70, 70]} />
-        <MeshReflectorMaterial
-          resolution={256}
-          blur={[150, 45]}
-          mixBlur={1}
-          mixStrength={28}
-          depthScale={1}
-          minDepthThreshold={0.3}
-          maxDepthThreshold={1.2}
-          color="#0d0806"
-          roughness={0.78}
-          metalness={0.6}
-          mirror={0.5}
-        />
-      </mesh>
+      <ReflectiveFloor
+        size={[70, 70]}
+        position={[0, -0.02, 0]}
+        color="#0d0806"
+        roughness={0.78}
+        metalness={0.6}
+        mirror={0.5}
+      />
     </group>
   );
 };

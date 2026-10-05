@@ -1,7 +1,7 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import ReflectiveFloor from '@/components/canvas/ReflectiveFloor';
 
 /**
  * Scroll-driven architectural flythrough.
@@ -457,22 +457,16 @@ const EstateScene = () => {
       <Grounds />
 
       {/* Ground plane — wet-looking so the house and pool read in reflection */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
-        <planeGeometry args={[220, 220]} />
-        <MeshReflectorMaterial
-          resolution={256}
-          blur={[180, 60]}
-          mixBlur={1.1}
-          mixStrength={14}
-          depthScale={1.1}
-          minDepthThreshold={0.4}
-          maxDepthThreshold={1.3}
-          color="#10151c"
-          roughness={0.92}
-          metalness={0.4}
-          mirror={0.4}
-        />
-      </mesh>
+      <ReflectiveFloor
+        size={[220, 220]}
+        position={[0, -0.02, 0]}
+        color="#10151c"
+        roughness={0.92}
+        metalness={0.4}
+        mirror={0.4}
+        mixStrength={14}
+        blur={[180, 60]}
+      />
     </group>
   );
 };

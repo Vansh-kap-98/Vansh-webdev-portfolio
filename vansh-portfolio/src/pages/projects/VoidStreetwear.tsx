@@ -5,10 +5,12 @@ import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import { useScrollFade } from '@/hooks/useScrollFade';
 import VoidStreetwearScene from '@/components/canvas/projects/VoidStreetwearScene';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const VoidStreetwear = () => {
+  const { lite, maxDpr } = useDeviceProfile();
   const scrollIndicatorRef = useScrollFade<HTMLDivElement>(200);
   const { setActiveAccent } = useThemeStore();
 
@@ -54,10 +56,10 @@ const VoidStreetwear = () => {
       {/* 3D Canvas */}
       <div className="fixed inset-0 z-0">
         <Canvas
-          shadows
+          shadows={!lite}
           camera={{ position: [0.9, 2.75, 10.4], fov: 44 }}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
-          dpr={[1, 1.5]}
+          dpr={[1, maxDpr]}
         >
           <VoidStreetwearScene />
         </Canvas>
@@ -76,7 +78,7 @@ const VoidStreetwear = () => {
 
       {/* Content Overlay */}
       <div className="relative z-10 pointer-events-none h-screen flex items-center">
-        <div className="px-12 max-w-lg">
+        <div className="px-6 md:px-12 scene-copy md:max-w-lg">
           <span className="label-chip mb-4">Verlet Cloth Solver</span>
           <h2 className="hero-text text-4xl md:text-5xl mb-6">
             Feel the<br />Movement

@@ -5,6 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import { useScrollFade } from '@/hooks/useScrollFade';
 import NeuroCoreScene from '@/components/canvas/projects/NeuroCoreScene';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -32,6 +33,7 @@ const FEATURES = [
 ] as const;
 
 const NeuroCore = () => {
+  const { lite, maxDpr } = useDeviceProfile();
   const scrollIndicatorRef = useScrollFade<HTMLDivElement>(200);
   const { setActiveAccent } = useThemeStore();
 
@@ -79,7 +81,7 @@ const NeuroCore = () => {
         <Canvas
           camera={{ position: [0, 0, 11.5], fov: 55 }}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
-          dpr={[1, 1.5]}
+          dpr={[1, maxDpr]}
         >
           <NeuroCoreScene />
         </Canvas>
@@ -101,11 +103,11 @@ const NeuroCore = () => {
         {FEATURES.map((feature, index) => (
           <div
             key={feature.title}
-            className={`h-screen flex items-center px-8 md:px-16 ${
+            className={`scene-section h-screen flex items-center px-8 md:px-16 ${
               index % 2 === 0 ? 'justify-start' : 'justify-end'
             }`}
           >
-            <div className={`max-w-md ${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
+            <div className={`scene-copy ${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
               {index === 0 && (
                 <span className="label-chip mb-5 pointer-events-auto">
                   InstancedMesh + Particle Morphing
@@ -114,10 +116,10 @@ const NeuroCore = () => {
               <div className="font-mono text-[10px] text-accent-purple tracking-[0.3em] uppercase mb-3">
                 {String(index + 1).padStart(2, '0')} / {feature.eyebrow}
               </div>
-              <h2 className="hero-text font-heading font-bold text-4xl md:text-5xl mb-4">
+              <h2 className="hero-text font-heading font-bold text-3xl sm:text-4xl md:text-5xl mb-3 md:mb-4">
                 {feature.title}
               </h2>
-              <p className="text-muted-foreground leading-relaxed">{feature.copy}</p>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{feature.copy}</p>
             </div>
           </div>
         ))}

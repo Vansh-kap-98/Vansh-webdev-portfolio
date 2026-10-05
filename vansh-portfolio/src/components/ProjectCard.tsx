@@ -57,7 +57,9 @@ const ProjectCard = ({
         scrollTrigger: {
           trigger: card,
           start: 'top bottom-=100',
-          toggleActions: 'play none none none',
+          // Fires once; `once` also unregisters it so it stops being evaluated
+          // on every subsequent scroll tick.
+          once: true,
         },
       }
     );

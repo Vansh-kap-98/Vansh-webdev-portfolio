@@ -22,6 +22,7 @@ const Footer = () => {
           scrollTrigger: {
             trigger: containerRef.current,
             start: 'top bottom-=100',
+            once: true,
           },
         }
       );

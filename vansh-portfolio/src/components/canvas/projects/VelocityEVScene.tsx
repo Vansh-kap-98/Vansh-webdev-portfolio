@@ -3,10 +3,10 @@ import { useFrame, useThree } from '@react-three/fiber';
 import {
   Environment,
   Lightformer,
-  MeshReflectorMaterial,
   Float,
   RoundedBox
 } from '@react-three/drei';
+import ReflectiveFloor from '@/components/canvas/ReflectiveFloor';
 import * as THREE from 'three';
 import gsap from 'gsap';
 
@@ -329,22 +329,16 @@ const VelocityEVScene = ({ color, cameraMode, modelType }: VelocityEVSceneProps)
         </Float>
       </group>
 
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]} receiveShadow>
-        <planeGeometry args={[50, 50]} />
-        <MeshReflectorMaterial
-          blur={[180, 55]}
-          resolution={256}
-          mixBlur={1}
-          mixStrength={40}
-          roughness={1}
-          depthScale={1.2}
-          minDepthThreshold={0.4}
-          maxDepthThreshold={1.4}
-          color="#101010"
-          metalness={0.5}
-          mirror={0.5}
-        />
-      </mesh>
+      <ReflectiveFloor
+        size={[50, 50]}
+        position={[0, -0.1, 0]}
+        color="#101010"
+        roughness={1}
+        metalness={0.5}
+        mirror={0.5}
+        mixStrength={40}
+        blur={[180, 55]}
+      />
     </>
   );
 };

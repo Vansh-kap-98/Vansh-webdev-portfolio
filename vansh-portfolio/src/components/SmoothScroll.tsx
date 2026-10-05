@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, ReactNode } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,6 +11,7 @@ interface SmoothScrollProps {
 }
 
 const SmoothScroll = ({ children }: SmoothScrollProps) => {
+  const { lite } = useDeviceProfile();
   const lenisRef = useRef<Lenis | null>(null);
 
   // Force scroll to top before Lenis takes over
@@ -20,6 +22,16 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
   }, []);
 
   useEffect(() => {
+    // On touch devices Lenis replaces the platform's own momentum scrolling with
+    // a JS-driven approximation, which is both slower and worse than what iOS and
+    // Android already do. Let the OS scroll, and just keep ScrollTrigger in sync.
+    if (lite) {
+      const onScroll = () => ScrollTrigger.update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      ScrollTrigger.refresh();
+      return () => window.removeEventListener('scroll', onScroll);
+    }
+
     // Ensure we're at top before creating Lenis
     window.scrollTo(0, 0);
 
@@ -55,7 +67,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
       gsap.ticker.remove(rafCallback);
       lenisRef.current = null;
     };
-  }, []);
+  }, [lite]);
 
   return <>{children}</>;
 };

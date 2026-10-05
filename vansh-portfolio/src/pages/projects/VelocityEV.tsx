@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import VelocityEVScene from '@/components/canvas/projects/VelocityEVScene';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -22,6 +23,7 @@ const modelOptions = [
 ];
 
 const VelocityEV = () => {
+  const { lite, maxDpr } = useDeviceProfile();
   const { setActiveAccent } = useThemeStore();
   const [selectedColor, setSelectedColor] = useState(colorOptions[0]);
   const [selectedModel, setSelectedModel] = useState(modelOptions[0]);
@@ -76,11 +78,11 @@ const VelocityEV = () => {
       <div className="fixed inset-0 z-0 bg-[#050505]">
         <Canvas
           camera={{ position: [8, 4, 8], fov: 45 }}
-          shadows
+          shadows={!lite}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
           // Uncapped, this rendered at full device pixel ratio — on a 2× display
           // that is 4× the fragments, with shadows and a reflector on top.
-          dpr={[1, 1.5]}
+          dpr={[1, maxDpr]}
         >
           <VelocityEVScene
             color={selectedColor.hex}
@@ -91,12 +93,12 @@ const VelocityEV = () => {
       </div>
 
       {/* Model Selection (Top Center) */}
-      <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex gap-4 bg-[#0a0a0a]/85 p-1 rounded-full border border-border/50 config-ui opacity-0">
+      <div className="fixed top-20 md:top-24 left-1/2 -translate-x-1/2 z-50 flex gap-1 md:gap-4 bg-[#0a0a0a]/85 p-1 rounded-full border border-border/50 config-ui opacity-0">
         {modelOptions.map((model) => (
           <button
             key={model.id}
             onClick={() => setSelectedModel(model)}
-            className={`px-6 py-2 rounded-full font-mono text-[10px] uppercase tracking-widest transition-all ${selectedModel.id === model.id
+            className={`px-3 md:px-6 py-2 rounded-full font-mono text-[9px] md:text-[10px] uppercase tracking-widest transition-all ${selectedModel.id === model.id
               ? 'bg-foreground text-background'
               : 'text-muted-foreground hover:text-foreground'
               }`}
@@ -107,8 +109,8 @@ const VelocityEV = () => {
       </div>
 
       {/* Color Picker (Top Left - Parallelogram Style) */}
-      <div className="fixed left-12 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-8 config-ui opacity-0">
-        <div className="flex flex-col gap-1">
+      <div className="fixed z-50 config-ui opacity-0 flex flex-col gap-3 md:gap-8 left-0 right-0 bottom-32 px-5 items-center md:items-start md:left-12 md:right-auto md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:px-0">
+        <div className="hidden md:flex flex-col gap-1">
           <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest opacity-60">
             Automotive Engineering
           </span>
@@ -121,7 +123,7 @@ const VelocityEV = () => {
             <div key={color.name} className="relative group">
               <button
                 onClick={() => setSelectedColor(color)}
-                className={`w-14 h-12 skew-x-[-15deg] border-2 transition-all duration-500 overflow-hidden ${selectedColor.name === color.name
+                className={`w-10 h-9 md:w-14 md:h-12 skew-x-[-15deg] border-2 transition-all duration-500 overflow-hidden ${selectedColor.name === color.name
                   ? 'border-white scale-110 shadow-[0_5px_15px_rgba(255,255,255,0.2)]'
                   : 'border-white/10 hover:border-white/40'
                   }`}
@@ -142,8 +144,8 @@ const VelocityEV = () => {
       </div>
 
       {/* View Toggle (Right) */}
-      <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 config-ui opacity-0">
-        <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-6 border-b border-border pb-4 text-right">
+      <div className="fixed z-50 config-ui opacity-0 flex gap-2 md:flex-col md:gap-4 left-0 right-0 bottom-20 justify-center px-5 md:left-auto md:right-8 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:justify-start md:px-0">
+        <span className="hidden md:block font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-6 border-b border-border pb-4 text-right">
           Perspective
         </span>
         <button
@@ -161,7 +163,7 @@ const VelocityEV = () => {
           Interior
         </button>
 
-        <div className="mt-8 pt-8 border-t border-border flex flex-col gap-2 text-right">
+        <div className="hidden md:flex mt-8 pt-8 border-t border-border flex-col gap-2 text-right">
           <div className="text-[10px] font-mono uppercase text-muted-foreground">Range</div>
           <div className="text-sm font-bold">{selectedModel.range}</div>
           <div className="text-[10px] font-mono uppercase text-muted-foreground mt-2">Performance</div>
@@ -170,8 +172,8 @@ const VelocityEV = () => {
       </div>
 
       {/* Checkout Section (Bottom Right) */}
-      <div className="fixed bottom-12 right-24 z-50 flex flex-col items-end gap-4 pointer-events-auto config-ui opacity-0">
-        <div className="text-right mb-2">
+      <div className="fixed z-50 config-ui opacity-0 flex flex-col gap-4 pointer-events-auto left-0 right-0 bottom-5 items-center px-5 md:left-auto md:right-24 md:bottom-12 md:items-end md:px-0">
+        <div className="hidden md:block text-right mb-2">
           <div className="text-[10px] font-mono text-muted-foreground uppercase">Estimated Delivery</div>
           <div className="text-xs">Late 2026</div>
         </div>
@@ -215,7 +217,7 @@ const VelocityEV = () => {
       )}
 
       {/* Bottom Left Branding Pills */}
-      <div className="fixed bottom-12 left-12 z-50 pointer-events-none config-ui opacity-0 flex flex-col gap-4">
+      <div className="hidden md:flex fixed bottom-12 left-12 z-50 pointer-events-none config-ui opacity-0 flex-col gap-4">
         <div className="flex items-center gap-3">
           <span className="label-chip bg-accent-gold/20 text-accent-gold border-accent-gold/30 text-[10px] px-3 py-1">V2.1 PRO</span>
           <span className="font-mono text-[9px] text-white/40 tracking-[0.3em] uppercase">Advanced Virtual Studio</span>

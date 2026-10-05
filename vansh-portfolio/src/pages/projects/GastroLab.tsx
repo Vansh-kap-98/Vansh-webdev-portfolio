@@ -5,6 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import { useScrollFade } from '@/hooks/useScrollFade';
 import GastroLabScene from '@/components/canvas/projects/GastroLabScene';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -28,6 +29,7 @@ const LAYER_NOTES = [
 ] as const;
 
 const GastroLab = () => {
+  const { lite, maxDpr } = useDeviceProfile();
   const scrollIndicatorRef = useScrollFade<HTMLDivElement>(200);
   const { setActiveAccent } = useThemeStore();
 
@@ -74,10 +76,10 @@ const GastroLab = () => {
       {/* 3D Canvas */}
       <div className="fixed inset-0 z-0">
         <Canvas
-          shadows
+          shadows={!lite}
           camera={{ position: [0, 2.4, 8.4], fov: 42 }}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
-          dpr={[1, 1.5]}
+          dpr={[1, maxDpr]}
         >
           <GastroLabScene />
         </Canvas>
@@ -109,11 +111,11 @@ const GastroLab = () => {
         {LAYER_NOTES.map((note, index) => (
           <div
             key={note.title}
-            className={`h-screen flex items-center px-8 md:px-16 ${
+            className={`scene-section h-screen flex items-center px-8 md:px-16 ${
               index % 2 === 0 ? 'justify-start' : 'justify-end'
             }`}
           >
-            <div className={`max-w-xs ${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
+            <div className={`scene-copy md:max-w-xs ${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
               <div className="font-mono text-[10px] text-accent-orange tracking-[0.3em] uppercase mb-2">
                 {String(index + 1).padStart(2, '0')} / Layer
               </div>

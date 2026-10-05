@@ -5,6 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import { useScrollFade } from '@/hooks/useScrollFade';
 import EstateScene from '@/components/canvas/projects/EstateScene';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -27,6 +28,7 @@ const SECTIONS = [
 ] as const;
 
 const TheEstate = () => {
+  const { lite, maxDpr } = useDeviceProfile();
   const scrollIndicatorRef = useScrollFade<HTMLDivElement>(200);
   const { setActiveAccent } = useThemeStore();
 
@@ -78,10 +80,10 @@ const TheEstate = () => {
       {/* 3D Canvas - Fixed background */}
       <div className="fixed inset-0 z-0">
         <Canvas
-          shadows
+          shadows={!lite}
           camera={{ position: [0, 15, 22], fov: 55 }}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
-          dpr={[1, 1.5]}
+          dpr={[1, maxDpr]}
         >
           <EstateScene />
         </Canvas>
@@ -103,11 +105,11 @@ const TheEstate = () => {
         {SECTIONS.map((section, index) => (
           <div
             key={section.title}
-            className={`h-screen w-full flex items-center pointer-events-none px-8 md:px-16 ${
+            className={`scene-section h-screen w-full flex items-center pointer-events-none px-8 md:px-16 ${
               index % 2 === 0 ? 'justify-start' : 'justify-end'
             }`}
           >
-            <div className={`max-w-md ${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
+            <div className={`scene-copy ${index % 2 === 0 ? 'text-left' : 'text-right'}`}>
               {index === 0 && (
                 <span className="label-chip mb-5 pointer-events-auto">
                   Dual Spline Rig + CatmullRomCurve3
@@ -116,10 +118,10 @@ const TheEstate = () => {
               <div className="font-mono text-[10px] text-accent-teal tracking-[0.3em] uppercase mb-3">
                 {String(index + 1).padStart(2, '0')} / {section.eyebrow}
               </div>
-              <h2 className="font-heading text-4xl md:text-6xl font-bold tracking-tight mb-4">
+              <h2 className="font-heading text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight mb-3 md:mb-4">
                 {section.title}
               </h2>
-              <p className="text-muted-foreground leading-relaxed">{section.copy}</p>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{section.copy}</p>
             </div>
           </div>
         ))}

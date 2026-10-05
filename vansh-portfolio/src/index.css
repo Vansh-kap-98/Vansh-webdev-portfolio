@@ -104,6 +104,14 @@
     z-index: 1000;
   }
 
+  /* Phones get no grain layer: it is nearly invisible at this size and it keeps
+     a full-viewport element on top of the compositing stack during every scroll. */
+  @media (max-width: 767px), (prefers-reduced-motion: reduce) {
+    body::before {
+      display: none;
+    }
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     font-weight: 700;
@@ -216,6 +224,33 @@
                 0 0 120px hsl(var(--current-accent) / 0.1);
   }
 
+  /*
+   * Copy that sits on top of a 3D scene. On a wide screen the text has empty
+   * canvas beside the subject to live in; on a phone it lands directly on top
+   * of it, so it gets a panel to stay readable against anything behind it.
+   */
+  .scene-copy {
+    max-width: 28rem;
+  }
+
+  @media (max-width: 767px) {
+    .scene-copy {
+      max-width: 100%;
+      text-align: left !important;
+      background: hsl(var(--background) / 0.82);
+      border: 1px solid hsl(var(--border));
+      border-radius: 0.5rem;
+      padding: 0.9rem 1rem 1rem;
+    }
+
+    /* Alternating left/right placement needs the full width on a narrow screen. */
+    .scene-section {
+      justify-content: flex-start !important;
+      padding-left: 1.1rem;
+      padding-right: 1.1rem;
+    }
+  }
+
   .deployed-flip-card {
     perspective: 1600px;
     min-height: 460px;
@@ -302,12 +337,19 @@
   }
 }
 
-/* Custom Cursor Hide on touch devices */
-@media (hover: none) {
-  html {
-    cursor: auto;
+/* Touch devices never get the JS cursor, so restore the native one everywhere. */
+@media (hover: none), (pointer: coarse), (max-width: 767px) {
+  html,
+  body,
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  [role='button'] {
+    cursor: auto !important;
   }
-  
+
   .custom-cursor {
     display: none !important;
   }

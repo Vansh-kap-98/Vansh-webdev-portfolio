@@ -4,6 +4,7 @@ import { ArrowLeft, X, Maximize2 } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { useThemeStore } from '@/stores/themeStore';
 import ArtifactsScene, { type Painting } from '@/components/canvas/projects/ArtifactsScene';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 /* ─── Injected CSS ──────────────────────────────────────────────────────────── */
@@ -28,6 +29,14 @@ const FOCUS_STYLES = `
   .focus-desc::-webkit-scrollbar { width: 3px; }
   .focus-desc::-webkit-scrollbar-track { background: transparent; }
   .focus-desc::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+  /* On a phone the side-by-side layout leaves an unreadable ~165px text column,
+     so the card stacks: image on top, placard beneath. */
+  @media (max-width: 767px) {
+    .focus-card      { flex-direction: column !important; width: 94vw !important; max-height: 88vh !important; }
+    .focus-img-wrap  { flex: 0 0 auto !important; height: 34vh !important; min-height: 0 !important; }
+    .focus-placard   { padding: 18px 16px 20px !important; }
+    .focus-desc      { max-height: 86px !important; }
+  }
   /* Hide global custom cursor on this page */
   .artifacts-page .custom-cursor { display: none !important; }
   .artifacts-page * { cursor: auto !important; }
@@ -35,6 +44,7 @@ const FOCUS_STYLES = `
 `;
 
 const Artifacts = () => {
+  const { lite, maxDpr } = useDeviceProfile();
   const { setActiveAccent } = useThemeStore();
 
   // ── Scroll text fade ──────────────────────────────────────────────────────
@@ -145,7 +155,7 @@ const Artifacts = () => {
         <Canvas
           camera={{ position: [0, 1.6, 4], fov: 70 }}
           gl={{ antialias: false, powerPreference: 'high-performance' }}
-          dpr={[1, 1.5]}
+          dpr={[1, maxDpr]}
         >
           <ArtifactsScene />
         </Canvas>
@@ -161,7 +171,7 @@ const Artifacts = () => {
           <span className="label-chip mb-4">ScrollControls + Emissive Proximity</span>
           <h2 className="hero-text text-4xl md:text-6xl mb-4">Enter the<br />Infinite</h2>
           <p className="text-muted-foreground max-w-md mx-auto text-sm">
-            Six public-domain masterpieces — hover a canvas to read its placard
+            Six public-domain masterpieces — tap or hover a canvas to read its placard
           </p>
         </div>
       </div>
@@ -257,7 +267,7 @@ const Artifacts = () => {
             </div>
 
             {/* ── Right: Placard ── */}
-            <div style={{ flex: 1, padding: '32px 28px', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
+            <div className="focus-placard" style={{ flex: 1, padding: '32px 28px', display: 'flex', flexDirection: 'column', overflowY: 'auto', position: 'relative' }}>
 
               {/* Close */}
               <button

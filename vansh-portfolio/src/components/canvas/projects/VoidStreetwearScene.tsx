@@ -1,7 +1,7 @@
 import { useRef, useMemo, useEffect, useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { MeshReflectorMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import ReflectiveFloor from '@/components/canvas/ReflectiveFloor';
 
 /**
  * Verlet-integrated cloth.
@@ -455,22 +455,14 @@ const VoidStreetwearScene = () => {
       </mesh>
 
       {/* Polished studio floor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[60, 60]} />
-        <MeshReflectorMaterial
-          resolution={256}
-          blur={[150, 45]}
-          mixBlur={0.9}
-          mixStrength={32}
-          depthScale={1}
-          minDepthThreshold={0.3}
-          maxDepthThreshold={1.2}
-          color="#0a0b0d"
-          roughness={0.75}
-          metalness={0.65}
-          mirror={0.55}
-        />
-      </mesh>
+      <ReflectiveFloor
+        size={[60, 60]}
+        color="#0a0b0d"
+        roughness={0.75}
+        metalness={0.65}
+        mirror={0.55}
+        mixStrength={32}
+      />
 
       <points ref={dust} geometry={dustGeometry}>
         <pointsMaterial size={0.022} color="#7d8794" transparent opacity={0.5} sizeAttenuation />

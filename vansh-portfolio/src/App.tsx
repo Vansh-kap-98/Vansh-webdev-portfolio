@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import CustomCursor from "./components/CustomCursor";
+import { useDeviceProfile } from "@/hooks/useDeviceProfile";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,16 @@ const RouteFallback = () => (
   </div>
 );
 
+/**
+ * CSS already hid the custom cursor on touch devices, but the component still
+ * mounted: a permanent rAF loop plus mousemove listeners doing work nobody
+ * could see. Gate the mount itself.
+ */
+const PointerLayer = () => {
+  const { isMobile } = useDeviceProfile();
+  return isMobile ? null : <CustomCursor />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -46,7 +57,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
-        <CustomCursor />
+        <PointerLayer />
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/" element={<Index />} />

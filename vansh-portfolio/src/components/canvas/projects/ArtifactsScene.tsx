@@ -1,7 +1,9 @@
 import { useRef, useMemo, useState, useEffect, useLayoutEffect, memo, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useScroll, ScrollControls, MeshReflectorMaterial } from '@react-three/drei';
+import { useScroll, ScrollControls } from '@react-three/drei';
 import * as THREE from 'three';
+import ReflectiveFloor from '@/components/canvas/ReflectiveFloor';
+import { useDeviceProfile } from '@/hooks/useDeviceProfile';
 
 // ─── Painting Data ─────────────────────────────────────────────────────────────
 export const PAINTINGS = [
@@ -439,6 +441,13 @@ const PaintingMesh = ({
           document.body.style.cursor = 'auto';
           window.dispatchEvent(new CustomEvent('artifacts:hover', { detail: { painting: null } }));
         }}
+        // Touch devices have no hover, so the placard would be unreachable on a
+        // phone without this. The page keeps the panel open until it is dismissed.
+        onClick={(e) => {
+          e.stopPropagation();
+          hoveredRef.current = true;
+          window.dispatchEvent(new CustomEvent('artifacts:hover', { detail: { painting } }));
+        }}
       >
         <planeGeometry args={[w, h]} />
         <meshStandardMaterial
@@ -596,22 +605,15 @@ const Architecture = memo(() => {
       ))}
 
       {/* ── Floor: polished stone, with a runner down the middle ── */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, midZ]} receiveShadow>
-        <planeGeometry args={[HALF_WIDTH * 2, CORRIDOR_LENGTH]} />
-        <MeshReflectorMaterial
-          resolution={256}
-          blur={[160, 50]}
-          mixBlur={1}
-          mixStrength={26}
-          depthScale={1.1}
-          minDepthThreshold={0.3}
-          maxDepthThreshold={1.3}
-          color="#120d0f"
-          roughness={0.5}
-          metalness={0.62}
-          mirror={0.62}
-        />
-      </mesh>
+      <ReflectiveFloor
+        size={[HALF_WIDTH * 2, CORRIDOR_LENGTH]}
+        position={[0, 0, midZ]}
+        color="#120d0f"
+        roughness={0.5}
+        metalness={0.62}
+        mirror={0.62}
+        mixStrength={26}
+      />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, midZ]} material={M.carpet} receiveShadow>
         <planeGeometry args={[3.1, CORRIDOR_LENGTH]} />
       </mesh>
@@ -662,10 +664,10 @@ const Architecture = memo(() => {
 Architecture.displayName = 'Architecture';
 
 // ─── Dust ────────────────────────────────────────────────────────────────────
-const Dust = () => {
+const Dust = ({ count }: { count: number }) => {
   const ref = useRef<THREE.Points>(null);
   const geometry = useMemo(() => {
-    const n = 420;
+    const n = count;
     const arr = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
       arr[i * 3] = (Math.random() - 0.5) * HALF_WIDTH * 2;
@@ -675,7 +677,7 @@ const Dust = () => {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(arr, 3));
     return g;
-  }, []);
+  }, [count]);
 
   useFrame((_, delta) => {
     if (!ref.current) return;
@@ -697,6 +699,7 @@ const Dust = () => {
 // ─── Scene ───────────────────────────────────────────────────────────────────
 const ArtifactsScene = () => {
   const scroll = useScroll();
+  const { lite } = useDeviceProfile();
   const frameCount = useRef(0);
   const lookTarget = useMemo(() => new THREE.Vector3(), []);
   const smoothedLookX = useRef(0);
@@ -779,7 +782,7 @@ const ArtifactsScene = () => {
         />
       ))}
 
-      <Dust />
+      <Dust count={lite ? 120 : 420} />
     </group>
   );
 };
